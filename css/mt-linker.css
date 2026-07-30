@@ -482,7 +482,7 @@ iconify-icon {
     gap: 60px;
     max-width: 1200px;
     margin: 0 auto;
-    align-items: center;
+    align-items: start;
 }
 
 @media (max-width: 1024px) {
@@ -507,7 +507,7 @@ iconify-icon {
     align-items: center;
     justify-content: center;
     position: sticky;
-    top: 100px;
+    top: 24px;
     min-width: 320px;
 }
 

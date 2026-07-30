@@ -81,10 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mtl_apply_submit'])) 
             </div>
         <?php endif; ?>
 
+        <h2 class="mtl-section-title" style="margin-bottom: 32px; text-align: center;">申请友链</h2>
         <div class="mtl-apply-container">
             <!-- 表单（左侧，最大 540px，垂直居中） -->
             <form class="mtl-apply-form" method="POST" id="applyForm" novalidate>
-                <h2 style="margin-bottom: 24px;">申请友链</h2>
 
                 <div class="mtl-form-group">
                     <label class="mtl-form-label" for="name">站点名称 *</label>
@@ -268,7 +268,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mtl_apply_submit'])) 
             var result = extra !== undefined
                 ? window.MTLinkerValidation[rule.fn](el.value, extra)
                 : window.MTLinkerValidation[rule.fn](el.value);
+
             applyHint(el, result);
+
+            // 【新增】：针对 HTTP 不安全协议的专属警告注入
+            if (id === 'link') {
+                var urlVal = el.value.trim().toLowerCase();
+                if (urlVal.startsWith('http://')) {
+                    // 添加黄色边框警告状态
+                    el.classList.add('warning');
+
+                    // 安全获取紧邻的 hint 容器并支持 HTML 标签（由于需要加粗样式）
+                    var rowDiv = el.closest('.mtl-input-row');
+                    var hintEl = rowDiv ? rowDiv.nextElementSibling : null;
+                    if (hintEl && hintEl.classList.contains('mtl-form-hint')) {
+                        hintEl.className = 'mtl-form-hint warning';
+                        hintEl.innerHTML = '按照网络安全规范，HTTPS 是现在更安全的一种链接方式。请在配置为 TLS 1.2 或更高的受信任证书之后，按照要求填写 HTTPS 链接。<strong>伪造的 HTTPS 链接可能会被屏蔽处理。</strong>';
+                    }
+                }
+            }
         }
 
         el.addEventListener('blur', runValidation);
