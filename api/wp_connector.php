@@ -60,6 +60,14 @@ add_action('wp_enqueue_scripts', function () use ($wp_connector_base_url) {
         '1.0.0'
     );
 
+    // ---- WordPress 主题样式覆盖补丁（最后加载，!important 强制覆盖）------
+    wp_enqueue_style(
+        'adt-wp-fix',
+        $wp_connector_base_url . '/css/wp-fix.css',
+        ['adt-color-board', 'adt-mt-linker-style'],
+        '1.0.0'
+    );
+
     // ---- 动态注入 Blocksy 容器宽度适配补丁 -----------------------------
     $blocksy_patch = "
     .mt-linker-page-wrapper {

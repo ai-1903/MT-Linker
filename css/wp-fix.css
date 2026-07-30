@@ -1,0 +1,269 @@
+/*
+ * Copyright (c) 2026 iCerya (icerya.com). All Rights Reserved.
+ *
+ * Released under the MIT License.
+ * See LICENSE file in the project root for full license text.
+ *
+ * @package   MT-Linker
+ * @author    iCerya
+ * @link      https://icerya.com
+ *
+ * WordPress 主题样式覆盖补丁
+ * ====================================
+ * 仅当 config.type = "wp" 时加载，用 !important 强制覆盖 WP 主题样式。
+ * 所有选择器限定在 .mt-linker-page-wrapper 内，避免污染页面其他区域。
+ */
+
+/* ---- 输入框 (input[type="text"], input[type="url"], input[type="number"]) ---- */
+.mt-linker-page-wrapper .mtl-form-input,
+.mt-linker-page-wrapper .mtl-form-input[type="text"],
+.mt-linker-page-wrapper .mtl-form-input[type="url"],
+.mt-linker-page-wrapper .mtl-form-input[type="number"],
+.mt-linker-page-wrapper .mtl-table input[type="text"],
+.mt-linker-page-wrapper .mtl-table input[type="url"],
+.mt-linker-page-wrapper .mtl-table input[type="number"] {
+    border: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.2) !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100)) !important;
+    font-size: 15px !important;
+    font-family: inherit !important;
+    line-height: 1.5 !important;
+    padding: 12px 16px !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    transition: border-color 0.2s, border-width 0.2s !important;
+}
+
+/* ---- 表格内输入框（继承表格尺寸）---- */
+.mt-linker-page-wrapper .mtl-table input[type="text"],
+.mt-linker-page-wrapper .mtl-table input[type="url"],
+.mt-linker-page-wrapper .mtl-table input[type="number"] {
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    height: 34px !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 80px !important;
+}
+
+/* ---- 文本域 (textarea) ---- */
+.mt-linker-page-wrapper .mtl-form-textarea,
+.mt-linker-page-wrapper .mtl-table textarea {
+    border: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.2) !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100)) !important;
+    font-size: 15px !important;
+    font-family: inherit !important;
+    line-height: 1.5 !important;
+    padding: 12px 16px !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    resize: vertical !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    transition: border-color 0.2s, border-width 0.2s !important;
+}
+
+.mt-linker-page-wrapper .mtl-table textarea {
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    min-height: 34px !important;
+    resize: vertical !important;
+}
+
+/* ---- 选择器 (select) ---- */
+.mt-linker-page-wrapper .mtl-form-select,
+.mt-linker-page-wrapper .mtl-table select {
+    border: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.2) !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100)) !important;
+    font-size: 15px !important;
+    font-family: inherit !important;
+    line-height: 1.5 !important;
+    padding: 10px 16px !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    transition: border-color 0.2s, border-width 0.2s !important;
+    height: 43px !important;
+}
+
+.mt-linker-page-wrapper .mtl-table select {
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    height: 34px !important;
+    width: auto !important;
+    min-width: 120px !important;
+}
+
+/* ---- 提交按钮 (submit button) ---- */
+.mt-linker-page-wrapper .mtl-form-submit {
+    width: 100% !important;
+    padding: 14px 24px !important;
+    background: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100)) !important;
+    color: rgba(var(--adt-colorBoard-buttonLabel) / var(--adt-colorAlpha-100)) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    transition: all 0.3s !important;
+}
+
+.mt-linker-page-wrapper .mtl-form-submit:hover {
+    opacity: 0.85 !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ---- 焦点状态统一 ---- */
+.mt-linker-page-wrapper .mtl-form-input:focus,
+.mt-linker-page-wrapper .mtl-form-textarea:focus,
+.mt-linker-page-wrapper .mtl-form-select:focus,
+.mt-linker-page-wrapper .mtl-table input:focus,
+.mt-linker-page-wrapper .mtl-table select:focus,
+.mt-linker-page-wrapper .mtl-table textarea:focus {
+    outline: none !important;
+    border-color: rgba(var(--adt-colorBoard-Blue) / var(--adt-colorAlpha-100)) !important;
+    border-width: 1px !important;
+    box-shadow: none !important;
+}
+
+/* ---- 错误 / 警告边框状态 ---- */
+.mt-linker-page-wrapper .mtl-form-input.error,
+.mt-linker-page-wrapper .mtl-table input.error {
+    border-color: rgba(var(--adt-colorBoard-Error) / var(--adt-colorAlpha-100)) !important;
+    border-width: 1px !important;
+}
+
+.mt-linker-page-wrapper .mtl-form-input.warning,
+.mt-linker-page-wrapper .mtl-table input.warning {
+    border-color: rgba(var(--adt-colorBoard-Warning) / var(--adt-colorAlpha-100)) !important;
+    border-width: 1px !important;
+}
+
+.mt-linker-page-wrapper .mtl-form-textarea.error,
+.mt-linker-page-wrapper .mtl-table textarea.error {
+    border-color: rgba(var(--adt-colorBoard-Error) / var(--adt-colorAlpha-100)) !important;
+    border-width: 1px !important;
+}
+
+.mt-linker-page-wrapper .mtl-form-textarea.warning,
+.mt-linker-page-wrapper .mtl-table textarea.warning {
+    border-color: rgba(var(--adt-colorBoard-Warning) / var(--adt-colorAlpha-100)) !important;
+    border-width: 1px !important;
+}
+
+/* ---- 操作按钮 (Dashboard 编辑/删除/分页) ---- */
+.mt-linker-page-wrapper .mtl-btn {
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    padding: 8px 16px !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    transition: all 0.2s !important;
+}
+
+/* ---- 添加链接按钮 ---- */
+.mt-linker-page-wrapper .mtl-add-button {
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    padding: 12px 24px !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* ---- Ping 检测按钮 ---- */
+.mt-linker-page-wrapper .mtl-ping-button {
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    padding: 12px 16px !important;
+    height: 44px !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* ---- 颜色输入框屏蔽步进器 ---- */
+.mt-linker-page-wrapper .mtl-color-row .mtl-form-input[type="number"]::-webkit-inner-spin-button,
+.mt-linker-page-wrapper .mtl-color-row .mtl-form-input[type="number"]::-webkit-outer-spin-button,
+.mt-linker-page-wrapper .mtl-table input[type="number"]::-webkit-inner-spin-button,
+.mt-linker-page-wrapper .mtl-table input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+.mt-linker-page-wrapper .mtl-color-row .mtl-form-input[type="number"],
+.mt-linker-page-wrapper .mtl-table input[type="number"] {
+    -moz-appearance: textfield !important;
+}
+
+/* ---- 模态框关闭按钮 ---- */
+.mt-linker-page-wrapper .mtl-modal-close {
+    border: none !important;
+    background: rgba(var(--adt-colorBoard-Label) / 0.1) !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* ---- 检测连接按钮 ---- */
+.mt-linker-page-wrapper .mtl-check-button {
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
