@@ -23,8 +23,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// ---- 加载共享渲染函数 ---------------------------------------------------
-require_once __DIR__ . '/render.php';
+// ---- 加载核心库和共享渲染函数 -------------------------------------------
+require_once dirname(__DIR__) . '/func/core.php';
+require_once dirname(__DIR__) . '/func/render.php';
+
+// ---- 初始化数据库 -------------------------------------------------------
+mtlinker_init_database();
 
 // ---- 计算资源路径（相对于当前文件）--------------------------------------
 $wp_connector_base_dir  = dirname(__DIR__);                                          // MT-Linker/
@@ -96,4 +100,31 @@ add_shortcode('mt_linker', function () use ($wp_connector_base_dir, $wp_connecto
 
     // ---- 渲染 -----------------------------------------------------------
     return mt_linker_render_html($mtData, $themeMode, $wp_connector_base_url);
+});
+
+// =========================================================================
+// 3. 注册短代码 [mtlinker-dash] （仪表板，需管理员权限）
+// =========================================================================
+add_shortcode('mtlinker-dash', function () use ($wp_connector_base_url) {
+
+    // ---- 权限验证 -------------------------------------------------------
+    if (!mtlinker_verify_auth()) {
+        return '<div class="mt-linker-error">Access Denied: Admin privileges required.</div>';
+    }
+
+    // ---- 加载仪表板页面 -------------------------------------------------
+    ob_start();
+    include dirname(__DIR__) . '/dash.php';
+    return ob_get_clean();
+});
+
+// =========================================================================
+// 4. 注册短代码 [mtlinker-apply] （申请页面，无需权限）
+// =========================================================================
+add_shortcode('mtlinker-apply', function () use ($wp_connector_base_url) {
+
+    // ---- 加载申请页面 ---------------------------------------------------
+    ob_start();
+    include dirname(__DIR__) . '/apply.php';
+    return ob_get_clean();
 });

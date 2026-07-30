@@ -37,14 +37,18 @@ define('MT_LINKER_LOADED', true);
 // ---- 基础路径 -----------------------------------------------------------
 define('MT_LINKER_BASE', dirname(__DIR__));
 
-// ---- 加载共享渲染函数 ---------------------------------------------------
-require_once __DIR__ . '/render.php';
+// ---- 加载核心库和共享渲染函数 -------------------------------------------
+require_once MT_LINKER_BASE . '/func/core.php';
+require_once MT_LINKER_BASE . '/func/render.php';
 
 // ---- 加载数据配置 -------------------------------------------------------
 $mt_json_path = MT_LINKER_BASE . '/data/mt-linker.json';
 $mt_data = file_exists($mt_json_path)
     ? json_decode(file_get_contents($mt_json_path), true)
     : [];
+
+// ---- 初始化数据库 -------------------------------------------------------
+mtlinker_init_database();
 
 // ---- 主题检测（Cookie 驱动，与 WordPress 主题兼容）----------------------
 $themeMode = isset($_COOKIE['theme']) ? $_COOKIE['theme'] : 'light';

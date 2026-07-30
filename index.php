@@ -112,7 +112,7 @@ See LICENSE file in the project root for full license text.
      * 启动 PHP 内置服务器即可预览：
      *   php -S localhost:8080
      */
-    include __DIR__ . '/func/connector.php';
+    include __DIR__ . '/api/connector.php';
     ?>
     </div>
 

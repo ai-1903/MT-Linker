@@ -4,3 +4,7 @@
 /memory/
 .DS_Store
 /AGENT.md
+mtklink-config.yml
+/data/*.db
+/data/*.db-*
+*.lock
