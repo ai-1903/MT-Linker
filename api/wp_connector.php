@@ -34,6 +34,11 @@ mtlinker_init_database();
 $wp_connector_base_dir  = dirname(__DIR__);                                          // MT-Linker/
 $wp_connector_base_url  = get_stylesheet_directory_uri() . '/AirDesign/MT-Linker';   // WordPress URI
 
+// ---- 注册资源路径常量（供模板文件使用）--------------------------------------
+if (!defined('MT_LINKER_BASE_URL')) {
+    define('MT_LINKER_BASE_URL', $wp_connector_base_url);
+}
+
 // =========================================================================
 // 1. 样式注册与引入
 // =========================================================================

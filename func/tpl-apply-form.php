@@ -116,6 +116,10 @@ $statusOptions = [
         </div>
         <?php endif; ?>
 
+        <?php if ($is_dash_mode): ?>
+        <input type="hidden" name="action" value="add">
+        <?php endif; ?>
+
         <div class="mtl-form-group">
             <label class="mtl-form-label">卡片颜色 (RGB<?php echo ($config['incheck_colorAlpha'] ?? '1') === '1' ? 'A' : ''; ?>) *</label>
             <div class="mtl-color-row">
