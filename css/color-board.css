@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) 2026 iCerya (icerya.com). All Rights Reserved.
+ *
+ * Released under the MIT License.
+ * See LICENSE file in the project root for full license text.
+ *
+ * @package   MT-Linker
+ * @author    iCerya
+ * @link      https://icerya.com
+ *
+ * Color Board — 调色盘 CSS 变量
+ * ====================================
+ * 定义全局颜色令牌，同时被独立 PHP 模式和 WordPress/Blocksy 主题兼容。
+ */
+
+:root {
+    /* 调色盘 */
+    --adt-colorBoard-Red: 255 59 48;
+    --adt-colorBoard-Orange: 255 149 0;
+    --adt-colorBoard-Yellow: 255 204 0;
+    --adt-colorBoard-Green: 52 199 89;
+    --adt-colorBoard-Mint: 0 199 190;
+    --adt-colorBoard-Teal: 48 176 199;
+    --adt-colorBoard-Cyan: 50 173 230;
+    --adt-colorBoard-Blue: 0 122 255;
+    --adt-colorBoard-Indigo: 88 86 214;
+    --adt-colorBoard-Purple: 175 82 222;
+    --adt-colorBoard-Pink: 255 45 85;
+    --adt-colorBoard-Gray: 142 142 147;
+
+    /* 语义色 */
+    --adt-colorBoard-Label: 0 0 0;
+    --adt-colorBoard-SecondaryLabel: 60 60 67;
+    --adt-colorBoard-TertiaryLabel: 60 60 67;
+    --adt-colorBoard-QuaternaryLabel: 60 60 67;
+
+    /* 透明度阶梯 */
+    --adt-colorAlpha-100: 1;
+    --adt-colorAlpha-85: 0.85;
+    --adt-colorAlpha-50: 0.5;
+    --adt-colorAlpha-30: 0.3;
+    --adt-colorAlpha-15: 0.15;
+    --adt-colorAlpha-7: 0.07;
+}
+
+[data-color-mode="dark"] {
+    --adt-colorBoard-Label: 255 255 255;
+    --adt-colorBoard-SecondaryLabel: 235 235 245;
+    --adt-colorBoard-TertiaryLabel: 235 235 245;
+    --adt-colorBoard-QuaternaryLabel: 235 235 245;
+}
