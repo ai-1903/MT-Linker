@@ -150,18 +150,13 @@ $statusOptions = [
                     <h3 class="mtl-card-name" id="previewName">Apple</h3>
                     <p class="mtl-card-des" id="previewDes">这是一个链接卡片的预览示例</p>
                 </div>
-
-                <div class="mtl-card-ping">
-                    <span class="mtl-ping-dot status-ok"></span>
-                    <span id="previewPingTime">42ms</span>
-                </div>
             </div>
 
             <div class="mtl-card-divider"></div>
 
             <div class="mtl-card-footer">
                 <div class="mtl-card-status">
-                    <span class="mtl-status-text status-ok" id="previewStatusText"><span class="mtl-ping-dot status-ok"></span> 连通正常</span>
+                    <span class="mtl-status-text status-ok" id="previewStatusText"><iconify-icon icon="mingcute:check-circle-line"></iconify-icon> 42ms 连接成功</span>
                 </div>
                 <div class="mtl-card-timestamp" id="previewTimestamp">刚刚</div>
             </div>
@@ -325,16 +320,22 @@ $statusOptions = [
             var ms = Math.round(performance.now() - t0);
             resultDiv.className = 'mtl-ping-result success';
             resultDiv.innerHTML = '<iconify-icon icon="mingcute:check-circle-line"></iconify-icon> 连接成功 (' + ms + 'ms)';
-            document.getElementById('previewPingTime').textContent = ms + 'ms';
-            document.getElementById('previewStatusText').className = 'mtl-status-text status-ok';
-            document.getElementById('previewStatusText').textContent = '\u00B7 连通正常';
+
+            var statusIcon = 'mingcute:check-circle-line';
+            var statusColor = 'var(--adt-colorBoard-Success)';
+            if (ms > 4000) {
+                statusColor = 'var(--adt-colorBoard-Caution)';
+            } else if (ms > 800) {
+                statusColor = 'var(--adt-colorBoard-Warning)';
+            }
+            document.getElementById('previewStatusText').innerHTML = '<iconify-icon icon="' + statusIcon + '"></iconify-icon> ' + ms + 'ms 连接成功';
+            document.getElementById('previewStatusText').style.color = 'rgb(' + statusColor + ')';
         } catch (e) {
             var ms = Math.round(performance.now() - t0);
             resultDiv.className = 'mtl-ping-result error';
             resultDiv.innerHTML = '<iconify-icon icon="mingcute:close-circle-line"></iconify-icon> 连接失败 (' + ms + 'ms)';
-            document.getElementById('previewPingTime').textContent = '超时';
-            document.getElementById('previewStatusText').className = 'mtl-status-text status-error';
-            document.getElementById('previewStatusText').textContent = '\u00B7 连接失败';
+            document.getElementById('previewStatusText').innerHTML = '<iconify-icon icon="mingcute:close-circle-line"></iconify-icon> 连接失败 (' + ms + 'ms)';
+            document.getElementById('previewStatusText').style.color = 'rgb(var(--adt-colorBoard-Middle))';
         }
 
         document.getElementById('previewTimestamp').textContent =

@@ -124,18 +124,13 @@ $statusNames = [
                                             <h3 class="mtl-card-name"><?php echo esc_html($linker['Name']); ?></h3>
                                             <p class="mtl-card-des"><?php echo esc_html($linker['Des']); ?></p>
                                         </div>
-
-                                        <div class="mtl-card-ping">
-                                            <span class="mtl-ping-dot status-ok"></span>
-                                            <span>--ms</span>
-                                        </div>
                                     </div>
 
                                     <div class="mtl-card-divider"></div>
 
                                     <div class="mtl-card-footer">
                                         <div class="mtl-card-status">
-                                            <span class="mtl-status-text status-ok">· 连通正常</span>
+                                            <span class="mtl-status-text status-ok"><iconify-icon icon="mingcute:check-circle-line"></iconify-icon> --ms 连接成功</span>
                                         </div>
                                         <div class="mtl-card-timestamp">--</div>
                                     </div>
@@ -222,26 +217,29 @@ async function checkAllLinks() {
 
     cards.forEach(card => {
         const url = card.getAttribute('href');
-        const pingDot = card.querySelector('.mtl-card-ping .mtl-ping-dot');
-        const pingTime = card.querySelector('.mtl-card-ping span:last-child');
         const statusText = card.querySelector('.mtl-status-text');
         const timestamp = card.querySelector('.mtl-card-timestamp');
 
         // 重置为检查中状态
-        pingDot.className = 'mtl-ping-dot status-checking';
-        pingTime.textContent = '检测中...';
-        if (statusText) { statusText.textContent = '· 正在检查'; }
+        statusText.innerHTML = '<iconify-icon icon="mingcute:loading-3-line" class="rotating"></iconify-icon> 检测中...';
+        statusText.style.color = '';
 
         // 并发检测，谁测完谁更新
         pingUrl(url).then(result => {
             if (result.success) {
-                pingDot.className = 'mtl-ping-dot status-ok';
-                pingTime.textContent = `${result.time}ms`;
-                if (statusText) { statusText.className = 'mtl-status-text status-ok'; statusText.textContent = '· 连通正常'; }
+                const ms = result.time;
+                let icon = 'mingcute:check-circle-line';
+                let colorVar = 'var(--adt-colorBoard-Success)';
+                if (ms > 4000) {
+                    colorVar = 'var(--adt-colorBoard-Caution)';
+                } else if (ms > 800) {
+                    colorVar = 'var(--adt-colorBoard-Warning)';
+                }
+                statusText.innerHTML = '<iconify-icon icon="' + icon + '"></iconify-icon> ' + ms + 'ms 连接成功';
+                statusText.style.color = 'rgb(' + colorVar + ')';
             } else {
-                pingDot.className = 'mtl-ping-dot status-error';
-                pingTime.textContent = '超时';
-                if (statusText) { statusText.className = 'mtl-status-text status-error'; statusText.textContent = '· 连接失败'; }
+                statusText.innerHTML = '<iconify-icon icon="mingcute:close-circle-line"></iconify-icon> 连接失败 (' + result.time + 'ms)';
+                statusText.style.color = 'rgb(var(--adt-colorBoard-Middle))';
             }
 
             timestamp.textContent = new Date().toLocaleTimeString('zh-CN', {
