@@ -13,12 +13,14 @@
 
 ## ✨ 特性
 
-- 🎨 **现代化 UI**：参考 Apple 设计规范，支持深色模式
-- 🔐 **多环境认证**：支持 WordPress、自定义 API、预留 MT-Kit / AirDesign Tools 接口
-- 💾 **SQLite 存储**：无感初始化，自动生成鉴权密钥，文件权限加固
-- ✅ **实时校验**：前端输入校验，防止非法数据，支持自定义规则
-- 📱 **响应式设计**：移动端友好，自适应网格布局
-- 🚀 **零配置启动**：开箱即用，支持独立 PHP 和 WordPress 集成
+- 🎨 **现代化 UI**：毛玻璃卡片、空间分隔颜色语法、深色模式
+- 🌐 **连接检测**：并发 Ping、四级延迟状态机、19 分钟自动缓存
+- 🔐 **多环境认证**：WordPress / 自定义 API / MT-Kit / AirDesign Tools
+- 💾 **SQLite 存储**：无感初始化，自动生成鉴权密钥，原子写入
+- ✅ **前端校验**：双字节长度计算，域名屏蔽，实时 visual feedback
+- ✏️ **行内编辑**：Dashboard 一键编辑/保存/取消，实时校验反馈
+- 📱 **响应式设计**：sticky 预览卡片，自适应网格布局
+- 🚀 **零配置启动**：`php -S localhost:8080`，同时支持 WordPress 短代码
 
 ---
 
@@ -98,18 +100,21 @@ incheck_colorAlpha: "1"   # 1=显示透明度控制器
 - **统计**：已连通门径 / 银轨通畅 / 单向门径
 - **分类**：本星域 / 联通百界 / 泛星域
 - **状态**：界域连通 / 通信失联 / 注销星域
+- **Ping 检测**：首次访问自动并发检测全部链接，结果缓存 19 分钟
+- **延迟状态机**：≤800ms Success / ≤4000ms Warning / >4000ms Caution / Offline Middle
 
 ### 申请页面 (apply.php)
 
 - **左侧**：表单输入（名称、描述、链接、图标、类别、颜色）
-- **右侧**：实时预览卡片
+- **右侧**：sticky 实时预览卡片
 - **校验**：失焦时实时检查，非法输入标红/黄并提示
 
 ### 管理面板 (dash.php)
 
 - **待审核表**：status=0 的申请
-- **已处理表**：其他状态的链接
-- **操作**：编辑 / 删除（需输入确认文本）
+- **已处理表**：分页展示（13 条/页）
+- **行内编辑**：点击编辑 → 实时校验 → 保存 / 取消回滚
+- **批量操作**：添加链接弹窗、删除确认
 
 ---
 
@@ -125,13 +130,13 @@ incheck_colorAlpha: "1"   # 1=显示透明度控制器
 
 | 字段 | 规则 |
 |------|------|
-| Name | 最多 25 汉字或 50 英文字符 |
-| Des | 最多 85 汉字或 170 英文字符 |
-| Link | HTTPS 开头，无尾部 `/`，不含托管域名，不重复 |
+| Name | 最多 50 字节（≈25 汉字或 50 英文字符） |
+| Des | 最多 170 字节（≈85 汉字或 170 英文字符） |
+| Link | HTTPS 开头，无尾部 `/`，不含托管域名 |
 | Icon | HTTPS 开头，`.jpg/.png/.svg` 结尾 |
-| Color | RGB 0-255，Alpha 0-1 |
+| Color | RGB 0-255 / Alpha 0-1 |
 
-**屏蔽域名**：`github.io`, `vercel.app`, `netlify.app`, `herokuapp.com`, `azurewebsites.net`, `cloudfront.net`, `pages.dev`, `web.app`, `firebaseapp.com`, `gitlab.io`, `surge.sh`, `now.sh`
+**屏蔽域名**：`github.io`, `vercel.app`, `gitee.io`, `netlify.app`, `onrender.com`, `firebaseapp.com`
 
 ### XSS 防护
 
@@ -169,14 +174,25 @@ incheck_colorAlpha: "1"   # 1=显示透明度控制器
 
 ```
 MT-Linker/
-├── api/              # 连接器（独立 / WordPress）
-├── css/              # 样式（支持深色模式）
-├── func/             # 核心库（配置、数据库、鉴权）
-├── js/               # 输入校验逻辑
-├── view/             # 页面视图
-├── data/             # SQLite 数据库（自动生成）
-├── index.php         # Demo 入口
-└── mtklink-config.yml # 环境配置
+├── api/                  # 连接器（独立 PHP / WordPress）
+│   ├── connector.php     #   独立 PHP include 方式
+│   └── wp_connector.php  #   WordPress 短代码注册
+├── css/                  # 样式
+│   ├── color-board.css   #   设计令牌 + 亮/暗模式
+│   └── mt-linker.css     #   主 UI 样式（卡片/表格/弹窗）
+├── func/                 # 核心库
+│   ├── core.php          #   配置读写、数据库、鉴权
+│   ├── render.php        #   共享渲染 + polyfill（esc_*）
+│   └── tpl-apply-form.php#   可复用表单模板
+├── js/
+│   └── inCheck.js        #   前端校验引擎
+├── view/                 # 页面视图
+│   ├── linker.php        #   链接展示
+│   ├── apply.php         #   申请友链
+│   └── dash.php          #   管理面板
+├── data/                 # SQLite + 配置（自动生成）
+├── index.php             # Demo 入口
+└── mtklink-config.yml    # 环境配置
 ```
 
 ### 开发指南
