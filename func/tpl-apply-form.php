@@ -36,7 +36,12 @@ $statusOptions = [
 
 <div class="mtl-apply-container">
     <!-- 表单（左侧，最大 540px） -->
-    <form class="mtl-apply-form" method="POST" id="applyForm" novalidate>
+    <?php $form_action = defined('ABSPATH') ? esc_url(admin_url('admin-post.php')) : ''; ?>
+    <form class="mtl-apply-form" method="POST" id="applyForm" novalidate
+          action="<?php echo $form_action; ?>">
+        <?php if (defined('ABSPATH')): ?>
+        <input type="hidden" name="action" value="<?php echo $is_dash_mode ? 'mtl_submit_dash' : 'mtl_submit_apply'; ?>">
+        <?php endif; ?>
 
         <div class="mtl-form-group">
             <label class="mtl-form-label" for="name">站点名称 *</label>
@@ -117,7 +122,7 @@ $statusOptions = [
         <?php endif; ?>
 
         <?php if ($is_dash_mode): ?>
-        <input type="hidden" name="action" value="add">
+        <input type="hidden" name="mtl_action" value="add">
         <?php endif; ?>
 
         <div class="mtl-form-group">

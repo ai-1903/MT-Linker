@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mtl_apply_submit'])) 
             <p style="margin-bottom: 24px; color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-50));">
                 您的申请已提交，等待管理员审核
             </p>
-            <a href="?page=linker" class="mtl-success-button">查看百界门径</a>
+            <a href="javascript:history.back();" class="mtl-success-button">返回</a>
         </div>
     <?php else: ?>
         <?php if ($submitError): ?>

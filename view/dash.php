@@ -36,8 +36,8 @@ if (!$db) {
 // ---- 处理操作 -----------------------------------------------------------
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        switch ($_POST['action']) {
+    if (isset($_POST['mtl_action'])) {
+        switch ($_POST['mtl_action']) {
             case 'delete':
                 $id = intval($_POST['id']);
                 $db->exec("DELETE FROM Linker WHERE NO = $id");
@@ -207,13 +207,13 @@ $typeOptions = [
             <?php if ($totalPages > 1): ?>
                 <div class="mtl-pagination">
                     <?php if ($page > 1): ?>
-                        <a href="?page=dash&p=<?php echo $page - 1; ?>" class="mtl-btn">上一页</a>
+                        <a href="<?php echo defined('ABSPATH') ? esc_url(add_query_arg('p', $page - 1)) : '?page=dash&p=' . ($page - 1); ?>" class="mtl-btn">上一页</a>
                     <?php endif; ?>
 
                     <span class="mtl-page-info">第 <?php echo $page; ?> / <?php echo $totalPages; ?> 页</span>
 
                     <?php if ($page < $totalPages): ?>
-                        <a href="?page=dash&p=<?php echo $page + 1; ?>" class="mtl-btn">下一页</a>
+                        <a href="<?php echo defined('ABSPATH') ? esc_url(add_query_arg('p', $page + 1)) : '?page=dash&p=' . ($page + 1); ?>" class="mtl-btn">下一页</a>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
@@ -247,6 +247,9 @@ const config = {
     showAlpha: <?php echo json_encode(($config['incheck_colorAlpha'] ?? '1') === '1'); ?>
 };
 
+const isWP = <?php echo defined('ABSPATH') ? 'true' : 'false'; ?>;
+const wpAdminPost = "<?php echo defined('ABSPATH') ? esc_js(admin_url('admin-post.php')) : ''; ?>";
+
 function showAddModal() {
     document.getElementById('addModal').classList.add('show');
 }
@@ -260,7 +263,17 @@ function deleteRow(id, name) {
     if (confirmation === `确认删除${name}`) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.innerHTML = `<input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="${id}">`;
+        if (isWP) {
+            form.action = wpAdminPost;
+        }
+        form.innerHTML = `<input type="hidden" name="mtl_action" value="delete"><input type="hidden" name="id" value="${id}">`;
+        if (isWP) {
+            const wpAction = document.createElement('input');
+            wpAction.type = 'hidden';
+            wpAction.name = 'action';
+            wpAction.value = 'mtl_submit_dash';
+            form.appendChild(wpAction);
+        }
         document.body.appendChild(form);
         form.submit();
     }
@@ -417,7 +430,7 @@ function enterEditMode(row, btn) {
 
 function validateAndSaveRow(row, btn) {
     const errors = [];
-    const data = { action: 'update', id: row.dataset.id };
+    const data = { mtl_action: 'update', id: row.dataset.id };
 
     // 提取并校验所有字段
     row.querySelectorAll('.mtl-editable').forEach(cell => {
@@ -476,12 +489,22 @@ function validateAndSaveRow(row, btn) {
     // 提交表单
     const form = document.createElement('form');
     form.method = 'POST';
+    if (isWP) {
+        form.action = wpAdminPost;
+    }
     for (const [key, value] of Object.entries(data)) {
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = key;
         input.value = value;
         form.appendChild(input);
+    }
+    if (isWP) {
+        const wpAction = document.createElement('input');
+        wpAction.type = 'hidden';
+        wpAction.name = 'action';
+        wpAction.value = 'mtl_submit_dash';
+        form.appendChild(wpAction);
     }
     document.body.appendChild(form);
     form.submit();

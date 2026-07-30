@@ -144,3 +144,33 @@ add_shortcode('mtklinker-show', function () use ($wp_connector_base_url) {
     include dirname(__DIR__) . '/view/linker.php';
     return ob_get_clean();
 });
+
+// =========================================================================
+// 6. admin-post.php 路由处理（WP 模式表单提交，PRG 模式）
+// =========================================================================
+
+// 申请表单处理（无需登录，公开提交）
+add_action('admin_post_nopriv_mtl_submit_apply', 'mtl_wp_handle_apply');
+add_action('admin_post_mtl_submit_apply', 'mtl_wp_handle_apply');
+function mtl_wp_handle_apply() {
+    $_SERVER['REQUEST_METHOD'] = 'POST';
+    ob_start();
+    require dirname(__DIR__) . '/view/apply.php';
+    ob_end_clean();
+    wp_safe_redirect(wp_get_referer() ?: home_url());
+    exit;
+}
+
+// 仪表板操作处理（需登录 + 权限验证）
+add_action('admin_post_mtl_submit_dash', 'mtl_wp_handle_dash');
+function mtl_wp_handle_dash() {
+    if (!mtlinker_verify_auth()) {
+        wp_die('Access Denied');
+    }
+    $_SERVER['REQUEST_METHOD'] = 'POST';
+    ob_start();
+    require dirname(__DIR__) . '/view/dash.php';
+    ob_end_clean();
+    wp_safe_redirect(wp_get_referer());
+    exit;
+}
