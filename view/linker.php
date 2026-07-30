@@ -18,6 +18,9 @@
 if (file_exists(__DIR__ . '/../func/core.php')) {
     require_once __DIR__ . '/../func/core.php';
 }
+if (file_exists(__DIR__ . '/../func/render.php')) {
+    require_once __DIR__ . '/../func/render.php';
+}
 
 // ---- 获取数据库连接 -----------------------------------------------------
 $db = mtlinker_get_db();
@@ -66,24 +69,26 @@ $statusNames = [
     <div class="mtl-hero">
         <h1 class="mtl-title">百界门径</h1>
 
-        <div class="mtl-stats">
-            <div class="mtl-stat-item">
+        <div class="mtl-stats-container">
+            <div class="mtl-stat-card">
                 <div class="mtl-stat-number"><?php echo $stats['connected']; ?></div>
                 <div class="mtl-stat-label">已连通门径</div>
             </div>
-            <div class="mtl-stat-item">
+            <div class="mtl-stat-card">
                 <div class="mtl-stat-number"><?php echo $stats['smooth']; ?></div>
                 <div class="mtl-stat-label">银轨通畅</div>
             </div>
-            <div class="mtl-stat-item">
+            <div class="mtl-stat-card">
                 <div class="mtl-stat-number"><?php echo $stats['oneway']; ?></div>
                 <div class="mtl-stat-label">单向门径</div>
             </div>
-            <button class="mtl-check-button" id="checkLinksBtn" onclick="checkAllLinks()">
-                <iconify-icon icon="mingcute:refresh-2-line"></iconify-icon>
-                检查连接
-            </button>
-            <span class="mtl-check-cooldown" id="cooldownText"></span>
+            <div class="mtl-stat-card mtl-check-card">
+                <button class="mtl-check-button" id="checkLinksBtn" onclick="checkAllLinks()">
+                    <iconify-icon icon="mingcute:refresh-2-line"></iconify-icon>
+                    检查连接
+                </button>
+                <span class="mtl-check-cooldown" id="cooldownText"></span>
+            </div>
         </div>
     </div>
 
@@ -106,19 +111,23 @@ $statusNames = [
                     <?php if (!empty($byStatus[$status])): ?>
                         <h3 class="mtl-section-subtitle"><?php echo esc_html($statusNames[$status]); ?></h3>
                         <div class="mtl-cards-grid">
-                            <?php foreach ($byStatus[$status] as $linker): ?>
+                            <?php foreach ($byStatus[$status] as $linker):
+                                    // 解析颜色: "R G B / A"
+                                    $colorRaw = $linker['color'] ?? '128 128 128 / 0.4';
+                                    $colorParts = explode('/', $colorRaw);
+                                    $rgb = explode(' ', trim($colorParts[0]));
+                                    $r = trim($rgb[0] ?? '128');
+                                    $g = trim($rgb[1] ?? '128');
+                                    $b = trim($rgb[2] ?? '128');
+                                    $a = isset($colorParts[1]) ? trim($colorParts[1]) : '0.6';
+                                ?>
                                 <a href="<?php echo esc_url($linker['Link']); ?>"
                                    class="mtl-card"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   style="background: linear-gradient(135deg, rgba(<?php echo esc_html($linker['color']); ?>) 0%, var(--card-bg) 50%);">
+                                   style="--mtl-r: <?php echo esc_html($r); ?>; --mtl-g: <?php echo esc_html($g); ?>; --mtl-b: <?php echo esc_html($b); ?>; --mtl-a: <?php echo esc_html($a); ?>; --mtl-icon-url: url(<?php echo esc_url($linker['icon']); ?>);">
 
-                                    <div class="mtl-card-header">
-                                        <img src="<?php echo esc_url($linker['icon']); ?>"
-                                             alt="<?php echo esc_html($linker['Name']); ?>"
-                                             class="mtl-card-icon"
-                                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22%3E%3Crect fill=%22%23e0e0e0%22 width=%2248%22 height=%2248%22/%3E%3C/svg%3E'">
-
+                                    <div class="mtl-card-body">
                                         <div class="mtl-card-info">
                                             <h3 class="mtl-card-name"><?php echo esc_html($linker['Name']); ?></h3>
                                             <p class="mtl-card-des"><?php echo esc_html($linker['Des']); ?></p>
@@ -134,8 +143,7 @@ $statusNames = [
 
                                     <div class="mtl-card-footer">
                                         <div class="mtl-card-status">
-                                            <span class="mtl-ping-dot status-ok"></span>
-                                            <span>连通正常</span>
+                                            <span class="mtl-status-text status-ok">· 连通正常</span>
                                         </div>
                                         <div class="mtl-card-timestamp">--</div>
                                     </div>
@@ -150,12 +158,27 @@ $statusNames = [
 </div>
 
 <script>
-// 冷却计时器
-let cooldownEnd = localStorage.getItem('mtlinker_cooldown_end');
-const COOLDOWN_DURATION = 540000; // 9分钟 = 540秒
+// 冷却计时器（使用 Cookie）
+const COOLDOWN_DURATION = 540000; // 9分钟 = 540000毫秒
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+function setCookie(name, value, maxAge) {
+    document.cookie = `${name}=${value}; path=/; max-age=${maxAge}`;
+}
+
+function deleteCookie(name) {
+    document.cookie = `${name}=; path=/; max-age=0`;
+}
 
 function updateCooldown() {
     const now = Date.now();
+    const cooldownEnd = getCookie('mtlinker_cooldown_end');
     const btn = document.getElementById('checkLinksBtn');
     const text = document.getElementById('cooldownText');
 
@@ -171,17 +194,75 @@ function updateCooldown() {
     } else {
         btn.disabled = false;
         text.textContent = '';
-        localStorage.removeItem('mtlinker_cooldown_end');
+        deleteCookie('mtlinker_cooldown_end');
     }
 }
 
-function checkAllLinks() {
+async function pingUrl(url) {
+    const startTime = performance.now();
+
+    try {
+        const response = await fetch(url, {
+            method: 'HEAD',
+            mode: 'no-cors',
+            cache: 'no-cache',
+        });
+        const endTime = performance.now();
+        return {
+            success: true,
+            time: Math.round(endTime - startTime),
+        };
+    } catch (error) {
+        const endTime = performance.now();
+        return {
+            success: false,
+            time: Math.round(endTime - startTime),
+        };
+    }
+}
+
+async function checkAllLinks() {
     const now = Date.now();
-    localStorage.setItem('mtlinker_cooldown_end', (now + COOLDOWN_DURATION).toString());
+    setCookie('mtlinker_cooldown_end', (now + COOLDOWN_DURATION).toString(), 540);
     updateCooldown();
 
-    // TODO: 实际检查逻辑（前端模拟 ping）
-    alert('检查功能待实现：将模拟 ping 各链接并更新状态显示');
+    const cards = document.querySelectorAll('.mtl-card');
+
+    for (const card of cards) {
+        const url = card.getAttribute('href');
+        const pingDot = card.querySelector('.mtl-card-ping .mtl-ping-dot');
+        const pingTime = card.querySelector('.mtl-card-ping span:last-child');
+        const statusText = card.querySelector('.mtl-status-text');
+        const timestamp = card.querySelector('.mtl-card-timestamp');
+
+        // 重置状态
+        pingDot.className = 'mtl-ping-dot status-checking';
+        pingTime.textContent = '检测中...';
+        if (statusText) statusText.textContent = '· 正在检查';
+
+        // 执行 ping
+        const result = await pingUrl(url);
+
+        if (result.success) {
+            pingDot.className = 'mtl-ping-dot status-ok';
+            pingTime.textContent = `${result.time}ms`;
+            if (statusText) { statusText.className = 'mtl-status-text status-ok'; statusText.textContent = '· 连通正常'; }
+        } else {
+            pingDot.className = 'mtl-ping-dot status-error';
+            pingTime.textContent = '超时';
+            if (statusText) { statusText.className = 'mtl-status-text status-error'; statusText.textContent = '· 连接失败'; }
+        }
+
+        // 更新时间戳
+        const currentTime = new Date();
+        timestamp.textContent = currentTime.toLocaleTimeString('zh-CN', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // 添加短暂延迟避免请求过于密集
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
 }
 
 // 页面加载时检查冷却
