@@ -738,3 +738,148 @@ iconify-icon {
 /* ================================================================
    WordPress / Blocksy 主题兼容层
    ================================================================ */
+
+/* ================================================================
+   Dashboard — 仪表板专属样式
+   ================================================================ */
+
+.mtl-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.mtl-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, rgba(var(--adt-colorBoard-Blue) / 0.9) 0%, rgba(var(--adt-colorBoard-Blue) / 0.7) 100%);
+    color: rgba(var(--adt-colorBoard-buttonLabel) / var(--adt-colorAlpha-100));
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(var(--adt-colorBoard-Blue) / 0.2);
+}
+
+.mtl-add-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(var(--adt-colorBoard-Blue) / 0.3);
+}
+
+.mtl-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 16px;
+}
+
+.mtl-page-info {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-65));
+}
+
+.mtl-message {
+    padding: 16px;
+    margin-bottom: 24px;
+    background: rgba(var(--adt-colorBoard-Green) / 0.1);
+    border-left: 4px solid rgba(var(--adt-colorBoard-Green) / var(--adt-colorAlpha-100));
+    border-radius: 8px;
+    color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100));
+}
+
+.mtl-color-preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.2);
+}
+
+.mtl-color-inputs-inline {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.mtl-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.mtl-btn-edit {
+    background: rgba(var(--adt-colorBoard-Blue) / var(--adt-colorAlpha-100));
+    color: rgba(var(--adt-colorBoard-buttonLabel) / var(--adt-colorAlpha-100));
+}
+
+.mtl-btn-delete {
+    background: rgba(var(--adt-colorBoard-Red) / var(--adt-colorAlpha-100));
+    color: rgba(var(--adt-colorBoard-buttonLabel) / var(--adt-colorAlpha-100));
+}
+
+.mtl-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.mtl-modal.show {
+    display: flex;
+}
+
+.mtl-modal-content {
+    background: rgba(var(--adt-colorBoard-Background) / 1);
+    padding: 0;
+    border-radius: 16px;
+    max-width: 1200px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.mtl-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-bottom: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.13);
+}
+
+.mtl-modal-header h2 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.mtl-modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(var(--adt-colorBoard-Label) / 0.1);
+    border-radius: 8px;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-65));
+}
+
+.mtl-modal-close:hover {
+    background: rgba(var(--adt-colorBoard-Red) / 0.1);
+    color: rgba(var(--adt-colorBoard-Red) / var(--adt-colorAlpha-100));
+}

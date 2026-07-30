@@ -30,6 +30,12 @@ if (!function_exists('esc_url')) {
         return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
     }
 }
+if (!function_exists('esc_js')) {
+    function esc_js($text) {
+        // 轻量级的安全转义，确保在不破坏 JS 执行的情况下过滤特殊字符
+        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+    }
+}
 
 // ---------------------------------------------------------------------------
 // HTML 渲染函数
