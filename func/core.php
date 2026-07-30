@@ -182,6 +182,11 @@ function mtlinker_get_db($providedUser = null, $providedKey = null) {
 // 鉴权验证函数
 // =========================================================================
 function mtlinker_verify_auth() {
+    // Demo 模式：默认具有管理员权限
+    if (defined('MTLINKER_DEMO_MODE') && MTLINKER_DEMO_MODE === true) {
+        return true;
+    }
+
     $config = mtlinker_load_config();
     $type = $config['type'] ?? 'none';
 

@@ -114,7 +114,7 @@ add_shortcode('mtlinker-dash', function () use ($wp_connector_base_url) {
 
     // ---- 加载仪表板页面 -------------------------------------------------
     ob_start();
-    include dirname(__DIR__) . '/dash.php';
+    include dirname(__DIR__) . '/view/dash.php';
     return ob_get_clean();
 });
 
@@ -125,6 +125,17 @@ add_shortcode('mtlinker-apply', function () use ($wp_connector_base_url) {
 
     // ---- 加载申请页面 ---------------------------------------------------
     ob_start();
-    include dirname(__DIR__) . '/apply.php';
+    include dirname(__DIR__) . '/view/apply.php';
+    return ob_get_clean();
+});
+
+// =========================================================================
+// 5. 注册短代码 [mtklinker-show] （链接列表，无需权限）
+// =========================================================================
+add_shortcode('mtklinker-show', function () use ($wp_connector_base_url) {
+
+    // ---- 加载链接展示页面 -----------------------------------------------
+    ob_start();
+    include dirname(__DIR__) . '/view/linker.php';
     return ob_get_clean();
 });

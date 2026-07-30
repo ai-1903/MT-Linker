@@ -111,8 +111,42 @@ See LICENSE file in the project root for full license text.
      * 将此文件放在 MT-Linker 根目录下，
      * 启动 PHP 内置服务器即可预览：
      *   php -S localhost:8080
+     *
+     * Demo 模式：默认具有管理员权限
      */
+
+    // Demo 模式：模拟管理员权限
+    define('MTLINKER_DEMO_MODE', true);
+
     include __DIR__ . '/api/connector.php';
+
+    // 显示示例页面链接
+    echo '<div style="text-align: center; margin: 40px 0; padding: 30px; background: var(--card-bg); border-radius: 16px;">';
+    echo '<h2 style="margin-bottom: 20px;">MT-Linker Demo</h2>';
+    echo '<p style="margin-bottom: 20px; color: var(--text-secondary);">选择要预览的页面：</p>';
+    echo '<div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">';
+    echo '<a href="?page=linker" style="padding: 12px 24px; background: rgba(var(--adt-colorBoard-Blue), 1); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">链接展示</a>';
+    echo '<a href="?page=apply" style="padding: 12px 24px; background: rgba(var(--adt-colorBoard-Green), 1); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">申请友链</a>';
+    echo '<a href="?page=dash" style="padding: 12px 24px; background: rgba(var(--adt-colorBoard-Orange), 1); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">管理面板</a>';
+    echo '</div>';
+    echo '</div>';
+
+    // 根据参数加载页面
+    if (isset($_GET['page'])) {
+        echo '<hr style="margin: 40px 0; border: none; height: 1px; background: rgba(var(--adt-colorBoard-Label), 0.13);">';
+
+        switch ($_GET['page']) {
+            case 'linker':
+                include __DIR__ . '/view/linker.php';
+                break;
+            case 'apply':
+                include __DIR__ . '/view/apply.php';
+                break;
+            case 'dash':
+                include __DIR__ . '/view/dash.php';
+                break;
+        }
+    }
     ?>
     </div>
 
