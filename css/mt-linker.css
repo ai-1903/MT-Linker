@@ -507,10 +507,8 @@ iconify-icon {
     align-items: center;
     justify-content: center;
     position: sticky;
-    /* 让卡片顶部在视窗中间位置停靠 */
-    top: 50vh;
-    /* 视觉补偿：向上偏移自身高度的 50%，实现真正的视觉中心居中 */
-    transform: translateY(-50%);
+    /* 取消 transform，改用 calc 计算：视窗 50% 减去卡片约一半的高度 */
+    top: calc(50vh - 100px);
     min-width: 320px;
 }
 
