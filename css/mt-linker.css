@@ -424,7 +424,8 @@ iconify-icon {
 }
 
 .mtl-table input,
-.mtl-table select {
+.mtl-table select,
+.mtl-table textarea {
     width: 100%;
     padding: 6px 10px;
     border: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.2);
@@ -432,6 +433,15 @@ iconify-icon {
     font-size: 14px;
     background: transparent;
     color: inherit;
+    line-height: 1.5;
+}
+
+.mtl-table select {
+    height: auto;
+}
+
+.mtl-table textarea {
+    resize: vertical;
 }
 
 .mtl-table input[type="text"],
@@ -443,8 +453,20 @@ iconify-icon {
     min-width: 200px;
 }
 
+/* 屏蔽 number 输入框的步进器 */
+.mtl-table input[type="number"]::-webkit-inner-spin-button,
+.mtl-table input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.mtl-table input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 .mtl-table input:focus,
-.mtl-table select:focus {
+.mtl-table select:focus,
+.mtl-table textarea:focus {
     outline: none;
     border-color: rgba(var(--adt-colorBoard-Blue) / var(--adt-colorAlpha-100));
 }
@@ -457,6 +479,7 @@ iconify-icon {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .mtl-btn-primary {
@@ -514,6 +537,13 @@ iconify-icon {
     max-width: 540px;
     width: 100%;
     justify-self: center;
+    padding: 32px;
+}
+
+@media (max-width: 768px) {
+    .mtl-apply-form {
+        padding: 24px;
+    }
 }
 
 .mtl-apply-preview {
@@ -910,7 +940,7 @@ iconify-icon {
 .mtl-table td:last-child {
     position: sticky;
     right: 0;
-    background: var(--card-bg, rgba(255, 255, 255, 0.72));
+    background: rgba(var(--adt-colorBoard-Background) / 1);
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
     box-shadow: -4px 0 8px rgba(0, 0, 0, 0.05);
@@ -933,4 +963,9 @@ iconify-icon {
     background: rgba(var(--adt-colorBoard-Yellow) / 0.08) !important;
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
+}
+
+/* 默认状态的固定列使用主背景色 */
+.mtl-table tbody tr:not(.editing):not(:nth-child(even)) td:last-child {
+    background: rgba(var(--adt-colorBoard-Background) / 1);
 }
