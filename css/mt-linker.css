@@ -340,15 +340,15 @@ iconify-icon {
 }
 
 .mtl-ping-dot.status-ok {
-    background: rgba(var(--adt-colorBoard-Success) / var(--adt-colorAlpha-100));
+    background: rgba(var(--adt-colorBoard-Green) / var(--adt-colorAlpha-100));
 }
 
 .mtl-ping-dot.status-error {
-    background: rgba(var(--adt-colorBoard-Error) / var(--adt-colorAlpha-100));
+    background: rgba(var(--adt-colorBoard-Red) / var(--adt-colorAlpha-100));
 }
 
 .mtl-ping-dot.status-checking {
-    background: rgba(var(--adt-colorBoard-Note) / var(--adt-colorAlpha-100));
+    background: rgba(var(--adt-colorBoard-Yellow) / var(--adt-colorAlpha-100));
     animation: pulse 0.8s ease-in-out infinite;
 }
 
@@ -392,9 +392,8 @@ iconify-icon {
 
 .mtl-table {
     width: 100%;
-    min-width: 1400px; /* 从 960px 修改为 1400px，提供充足横滚空间 */
+    min-width: 960px;
     border-collapse: collapse;
-    background: transparent; /* 表格本身透明，利用容器毛玻璃 */
     font-size: 14px;
 }
 
@@ -415,35 +414,12 @@ iconify-icon {
     color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100));
 }
 
-.mtl-table tbody tr {
-    background: transparent;
-    transition: background 0.3s;
-}
-.mtl-table tbody tr:nth-child(even) {
-    background: rgba(var(--adt-colorBoard-Label) / 0.07);
-}
-.mtl-table tbody tr.editing {
-    background: rgba(var(--adt-colorBoard-Yellow) / 0.08) !important;
+.mtl-table tbody tr:hover {
+    background: rgba(var(--adt-colorBoard-Label) / 0.03);
 }
 
-.mtl-table input[type="text"],
-.mtl-table input[type="url"],
+.mtl-table input,
 .mtl-table select {
-    min-width: 120px;
-    box-sizing: border-box;
-    width: 100%;
-    padding: 6px 10px;
-    border: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.2);
-    border-radius: 8px;
-    font-size: 14px;
-    background: transparent;
-    color: inherit;
-}
-.mtl-table textarea {
-    min-width: 200px;
-    box-sizing: border-box;
-    resize: horizontal;
-    line-height: 1.4;
     width: 100%;
     padding: 6px 10px;
     border: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.2);
@@ -850,14 +826,15 @@ iconify-icon {
 .mtl-modal {
     display: none;
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    /* 加深暗色遮罩 */
-    background: rgba(0, 0, 0, 0.6);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
 }
 
 .mtl-modal.show {
@@ -896,11 +873,7 @@ iconify-icon {
     background: rgba(var(--adt-colorBoard-Label) / 0.1);
     border-radius: 8px;
     font-size: 24px;
-    /* 使用 Flex 居中替代原有的错位逻辑 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: normal;
+    line-height: 1;
     cursor: pointer;
     transition: all 0.2s;
     color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-65));
@@ -909,30 +882,4 @@ iconify-icon {
 .mtl-modal-close:hover {
     background: rgba(var(--adt-colorBoard-Red) / 0.1);
     color: rgba(var(--adt-colorBoard-Red) / var(--adt-colorAlpha-100));
-}
-
-/* ================================================================
-   Dashboard — 右侧操作列固定吸附
-   ================================================================ */
-
-/* 固定最后一列操作头/数据，并为其增加毛玻璃与实色混合以屏蔽底层文字穿透现象 */
-.mtl-table th:last-child,
-.mtl-table td:last-child {
-    position: sticky;
-    right: 0;
-    z-index: 2;
-    /* 使用容器一致的背景色打底 */
-    background-color: var(--card-bg, rgba(255, 255, 255, 0.95));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    /* 提供左侧虚化阴影分隔 */
-    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.05);
-}
-
-/* 兼容由于吸底背景变色，导致的视觉割裂，使用渐变图层覆盖混色 */
-.mtl-table tbody tr:nth-child(even) td:last-child {
-    background-image: linear-gradient(rgba(var(--adt-colorBoard-Label) / 0.07), rgba(var(--adt-colorBoard-Label) / 0.07));
-}
-.mtl-table tbody tr.editing td:last-child {
-    background-image: linear-gradient(rgba(var(--adt-colorBoard-Yellow) / 0.08), rgba(var(--adt-colorBoard-Yellow) / 0.08));
 }
