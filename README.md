@@ -9,6 +9,11 @@
 [![WordPress](https://img.shields.io/badge/WordPress-5.0+-green.svg)](https://wordpress.org/)
 </div>
 
+## MT Note
+
+> [!TIP]
+> 本项目使用 MIT 许可证，可自由使用、修改和分发，仅需保留原始版权声明即可。
+
 ---
 
 ## ✨ 特性
