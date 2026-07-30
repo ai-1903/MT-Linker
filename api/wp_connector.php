@@ -49,7 +49,7 @@ add_action('wp_enqueue_scripts', function () use ($wp_connector_base_url) {
         'adt-color-board',
         $wp_connector_base_url . '/css/color-board.css',
         [],
-        '1.0.0'
+        '1.1.0'
     );
 
     // ---- MT-Linker UI 主样式 -------------------------------------------
@@ -57,7 +57,7 @@ add_action('wp_enqueue_scripts', function () use ($wp_connector_base_url) {
         'adt-mt-linker-style',
         $wp_connector_base_url . '/css/mt-linker.css',
         ['adt-color-board'],
-        '1.0.0'
+        '1.1.0'
     );
 
     // ---- WordPress 主题样式覆盖补丁（最后加载，!important 强制覆盖）------
@@ -65,7 +65,7 @@ add_action('wp_enqueue_scripts', function () use ($wp_connector_base_url) {
         'adt-wp-fix',
         $wp_connector_base_url . '/css/wp-fix.css',
         ['adt-color-board', 'adt-mt-linker-style'],
-        '1.0.0'
+        '1.1.0'
     );
 
     // ---- 动态注入 Blocksy 容器宽度适配补丁 -----------------------------
