@@ -145,9 +145,9 @@ $statusNames = [
 </div>
 
 <script>
-// 冷却计时器（使用 Cookie）
-const COOLDOWN_DURATION = 540000; // 9分钟 = 540000毫秒
-
+// =========================================================================
+// Cookie 工具
+// =========================================================================
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -163,7 +163,134 @@ function deleteCookie(name) {
     document.cookie = `${name}=; path=/; max-age=0`;
 }
 
-function updateCooldown() {
+// =========================================================================
+// 计时器常量
+// =========================================================================
+const AUTO_CACHE_TTL  = 1140; // 19 分钟（秒）
+const MANUAL_COOLDOWN = 540;  // 9 分钟（秒）
+
+// =========================================================================
+// Ping 结果缓存
+// =========================================================================
+function getPingCache() {
+    const raw = getCookie('mtlinker_ping_cache');
+    if (!raw) return null;
+    try { return JSON.parse(decodeURIComponent(raw)); } catch (e) { return null; }
+}
+
+function setPingCache(results) {
+    const data = { t: Date.now(), r: results };
+    setCookie('mtlinker_ping_cache', encodeURIComponent(JSON.stringify(data)), AUTO_CACHE_TTL);
+}
+
+function isAutoCacheValid() {
+    const cache = getPingCache();
+    if (!cache || !cache.t || !cache.r) return false;
+    // 需要上一次是自动检测
+    if (getCookie('mtlinker_auto_cooldown')) {
+        const cooldown = parseInt(getCookie('mtlinker_auto_cooldown'));
+        if (Date.now() < cooldown && cache.r && Object.keys(cache.r).length > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// =========================================================================
+// 渲染单个卡片的 Ping 结果
+// =========================================================================
+function renderCardStatus(statusText, result) {
+    if (result.s) {
+        const ms = result.t;
+        let colorVar = 'var(--adt-colorBoard-Success)';
+        if (ms > 4000) {
+            colorVar = 'var(--adt-colorBoard-Caution)';
+        } else if (ms > 800) {
+            colorVar = 'var(--adt-colorBoard-Warning)';
+        }
+        statusText.innerHTML = '<iconify-icon icon="mingcute:check-circle-line"></iconify-icon> ' + ms + 'ms 连接成功';
+        statusText.style.color = 'rgb(' + colorVar + ')';
+    } else {
+        statusText.innerHTML = '<iconify-icon icon="mingcute:close-circle-line"></iconify-icon> 连接失败 (' + result.t + 'ms)';
+        statusText.style.color = 'rgb(var(--adt-colorBoard-Middle))';
+    }
+}
+
+function renderCardChecking(statusText) {
+    statusText.innerHTML = '<iconify-icon icon="mingcute:loading-3-line" class="rotating"></iconify-icon> 检测中...';
+    statusText.style.color = '';
+}
+
+// =========================================================================
+// 从缓存渲染全部卡片
+// =========================================================================
+function renderFromCache(cache) {
+    const cards = document.querySelectorAll('.mtl-card');
+    const cacheTime = new Date(cache.t);
+    const timeStr = cacheTime.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    cards.forEach(card => {
+        const url = card.getAttribute('href');
+        const statusText = card.querySelector('.mtl-status-text');
+        if (!statusText) return;
+        if (cache.r[url]) {
+            renderCardStatus(statusText, cache.r[url]);
+        }
+    });
+    document.querySelectorAll('.mtl-card-timestamp').forEach(el => { el.textContent = timeStr; });
+}
+
+// =========================================================================
+// 核心：执行批量 Ping 并缓存
+// =========================================================================
+function runBatchPing(onComplete) {
+    const cards = document.querySelectorAll('.mtl-card');
+    const results = {};
+    let pending = cards.length;
+
+    cards.forEach(card => {
+        const url = card.getAttribute('href');
+        const statusText = card.querySelector('.mtl-status-text');
+        if (!statusText) { pending--; return; }
+
+        renderCardChecking(statusText);
+
+        pingUrl(url).then(result => {
+            results[url] = { s: result.success, t: result.time };
+            renderCardStatus(statusText, { s: result.success, t: result.time });
+
+            pending--;
+            if (pending === 0) {
+                setPingCache(results);
+                const timeStr = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                document.querySelectorAll('.mtl-card-timestamp').forEach(el => { el.textContent = timeStr; });
+                if (onComplete) onComplete();
+            }
+        });
+    });
+}
+
+// =========================================================================
+// 自动检测（页面加载时）
+// =========================================================================
+function autoPingAll() {
+    runBatchPing(function() {
+        setCookie('mtlinker_auto_cooldown', (Date.now() + AUTO_CACHE_TTL * 1000).toString(), AUTO_CACHE_TTL);
+    });
+}
+
+// =========================================================================
+// 手动检测（按钮点击）
+// =========================================================================
+function checkAllLinks() {
+    setCookie('mtlinker_cooldown_end', (Date.now() + MANUAL_COOLDOWN * 1000).toString(), MANUAL_COOLDOWN);
+    updateManualCooldown();
+    runBatchPing();
+}
+
+// =========================================================================
+// 冷却计时器 UI
+// =========================================================================
+function updateManualCooldown() {
     const now = Date.now();
     const cooldownEnd = getCookie('mtlinker_cooldown_end');
     const btn = document.getElementById('checkLinksBtn');
@@ -173,11 +300,9 @@ function updateCooldown() {
         const remaining = Math.ceil((parseInt(cooldownEnd) - now) / 1000);
         const minutes = Math.floor(remaining / 60);
         const seconds = remaining % 60;
-
         btn.disabled = true;
         text.textContent = `冷却中 ${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-        setTimeout(updateCooldown, 1000);
+        setTimeout(updateManualCooldown, 1000);
     } else {
         btn.disabled = false;
         text.textContent = '';
@@ -185,71 +310,28 @@ function updateCooldown() {
     }
 }
 
+// =========================================================================
+// 单个 URL Ping
+// =========================================================================
 async function pingUrl(url) {
     const startTime = performance.now();
-
     try {
-        const response = await fetch(url, {
-            method: 'HEAD',
-            mode: 'no-cors',
-            cache: 'no-cache',
-        });
-        const endTime = performance.now();
-        return {
-            success: true,
-            time: Math.round(endTime - startTime),
-        };
+        await fetch(url, { method: 'HEAD', mode: 'no-cors', cache: 'no-cache' });
+        return { success: true, time: Math.round(performance.now() - startTime) };
     } catch (error) {
-        const endTime = performance.now();
-        return {
-            success: false,
-            time: Math.round(endTime - startTime),
-        };
+        return { success: false, time: Math.round(performance.now() - startTime) };
     }
 }
 
-async function checkAllLinks() {
-    const now = Date.now();
-    setCookie('mtlinker_cooldown_end', (now + COOLDOWN_DURATION).toString(), 540);
-    updateCooldown();
-
-    const cards = document.querySelectorAll('.mtl-card');
-
-    cards.forEach(card => {
-        const url = card.getAttribute('href');
-        const statusText = card.querySelector('.mtl-status-text');
-        const timestamp = card.querySelector('.mtl-card-timestamp');
-
-        // 重置为检查中状态
-        statusText.innerHTML = '<iconify-icon icon="mingcute:loading-3-line" class="rotating"></iconify-icon> 检测中...';
-        statusText.style.color = '';
-
-        // 并发检测，谁测完谁更新
-        pingUrl(url).then(result => {
-            if (result.success) {
-                const ms = result.time;
-                let icon = 'mingcute:check-circle-line';
-                let colorVar = 'var(--adt-colorBoard-Success)';
-                if (ms > 4000) {
-                    colorVar = 'var(--adt-colorBoard-Caution)';
-                } else if (ms > 800) {
-                    colorVar = 'var(--adt-colorBoard-Warning)';
-                }
-                statusText.innerHTML = '<iconify-icon icon="' + icon + '"></iconify-icon> ' + ms + 'ms 连接成功';
-                statusText.style.color = 'rgb(' + colorVar + ')';
-            } else {
-                statusText.innerHTML = '<iconify-icon icon="mingcute:close-circle-line"></iconify-icon> 连接失败 (' + result.time + 'ms)';
-                statusText.style.color = 'rgb(var(--adt-colorBoard-Middle))';
-            }
-
-            timestamp.textContent = new Date().toLocaleTimeString('zh-CN', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        });
-    });
-}
-
-// 页面加载时检查冷却
-updateCooldown();
+// =========================================================================
+// 初始化
+// =========================================================================
+(function init() {
+    updateManualCooldown();
+    if (isAutoCacheValid()) {
+        renderFromCache(getPingCache());
+    } else {
+        autoPingAll();
+    }
+})();
 </script>
