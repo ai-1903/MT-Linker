@@ -113,10 +113,9 @@ $statusNames = [
                         <div class="mtl-cards-grid">
                             <?php foreach ($byStatus[$status] as $linker):
                                 ?>
-                                <a href="<?php echo esc_url($linker['Link']); ?>"
-                                   class="mtl-card"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
+                                <a href="<?php echo ($linker['status'] == 3 || $linker['status'] == 4) ? 'javascript:void(0)' : esc_url($linker['Link']); ?>"
+                                   class="mtl-card<?php echo ($linker['status'] == 3 || $linker['status'] == 4) ? ' status-offline' : ''; ?>"
+                                   <?php if ($linker['status'] != 3 && $linker['status'] != 4): ?>target="_blank" rel="noopener noreferrer"<?php endif; ?>
                                    style="--mtl-color-args: <?php echo esc_html($linker['color'] ?? '128 128 128 / 0.4'); ?>; --mtl-icon-url: url(<?php echo esc_url($linker['icon']); ?>);">
 
                                     <div class="mtl-card-body">

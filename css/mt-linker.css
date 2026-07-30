@@ -229,6 +229,40 @@ iconify-icon {
     -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
     pointer-events: none;
     z-index: 0;
+    opacity: 0.25;
+    filter: saturate(0.6);
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-color-mode="dark"] .mtl-card::after {
+    opacity: 0.19;
+}
+
+.mtl-card:hover::after {
+    opacity: 1;
+    filter: saturate(1);
+}
+
+/* 离线卡片：通信失联 / 注销星域 — 饱和度恒为 0，不可点击 */
+.mtl-card.status-offline::after {
+    filter: saturate(0);
+}
+.mtl-card.status-offline {
+    pointer-events: none;
+    cursor: default;
+}
+.mtl-card.status-offline:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: rgba(var(--adt-colorBoard-Label) / 0.13);
+}
+.mtl-card.status-offline:hover::after {
+    opacity: 0.25;
+    filter: saturate(0);
+}
+[data-color-mode="dark"] .mtl-card.status-offline:hover::after {
+    opacity: 0.19;
 }
 
 .mtl-card:hover {
@@ -392,11 +426,12 @@ iconify-icon {
 
 .mtl-table {
     width: 100%;
-    min-width: 1400px;
-    border-collapse: separate; 
-    border-spacing: 0; 
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0;
     font-size: 14px;
     background: transparent;
+    table-layout: auto;
 }
 
 .mtl-table thead {
@@ -414,6 +449,12 @@ iconify-icon {
     padding: 12px 8px;
     border-bottom: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.07);
     color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100));
+    white-space: nowrap;
+}
+
+.mtl-table td.mtl-readonly,
+.mtl-table td.mtl-editable {
+    max-width: none;
 }
 
 .mtl-table tbody tr:hover {
@@ -427,7 +468,9 @@ iconify-icon {
 .mtl-table input,
 .mtl-table select,
 .mtl-table textarea {
-    width: 100%;
+    width: auto;
+    max-width: none;
+    min-width: 80px;
     padding: 6px 10px;
     border: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.2);
     border-radius: 8px;
@@ -436,6 +479,12 @@ iconify-icon {
     color: inherit;
     line-height: 1.5;
     box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.mtl-table select {
+    width: auto;
+    min-width: 120px;
 }
 
 .mtl-table input[type="text"],
@@ -449,19 +498,13 @@ iconify-icon {
 .mtl-table textarea {
     resize: vertical;
     min-height: 34px;
-}
-
-.mtl-table textarea {
-    resize: vertical;
+    min-width: 200px;
+    white-space: pre-wrap;
 }
 
 .mtl-table input[type="text"],
 .mtl-table input[type="url"] {
-    min-width: 120px;
-}
-
-.mtl-table textarea {
-    min-width: 200px;
+    min-width: 100px;
 }
 
 /* 屏蔽 number 输入框的步进器 */
@@ -612,12 +655,22 @@ iconify-icon {
 }
 
 .mtl-form-input.error {
-    border-color: rgba(var(--adt-colorBoard-Red) / var(--adt-colorAlpha-100));
+    border-color: rgba(var(--adt-colorBoard-Error) / var(--adt-colorAlpha-100));
     border-width: 1px;
 }
 
 .mtl-form-input.warning {
-    border-color: rgba(var(--adt-colorBoard-Yellow) / var(--adt-colorAlpha-100));
+    border-color: rgba(var(--adt-colorBoard-Warning) / var(--adt-colorAlpha-100));
+    border-width: 1px;
+}
+
+.mtl-form-textarea.error {
+    border-color: rgba(var(--adt-colorBoard-Error) / var(--adt-colorAlpha-100));
+    border-width: 1px;
+}
+
+.mtl-form-textarea.warning {
+    border-color: rgba(var(--adt-colorBoard-Warning) / var(--adt-colorAlpha-100));
     border-width: 1px;
 }
 
@@ -652,14 +705,25 @@ iconify-icon {
     margin-top: 6px;
     line-height: 1.5;
     min-height: 20px;
+    color: rgba(var(--adt-colorBoard-Label) / 0.5);
 }
 
 .mtl-form-hint.error {
-    color: rgba(var(--adt-colorBoard-Red) / var(--adt-colorAlpha-100));
+    color: rgba(var(--adt-colorBoard-Error) / var(--adt-colorAlpha-100));
 }
 
 .mtl-form-hint.warning {
-    color: rgba(var(--adt-colorBoard-Yellow) / var(--adt-colorAlpha-100));
+    color: rgba(var(--adt-colorBoard-Warning) / var(--adt-colorAlpha-100));
+}
+
+/* 屏蔽表单 number 输入框的步进器 */
+.mtl-color-row .mtl-form-input[type="number"]::-webkit-inner-spin-button,
+.mtl-color-row .mtl-form-input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.mtl-color-row .mtl-form-input[type="number"] {
+    -moz-appearance: textfield;
 }
 
 .mtl-ping-button {

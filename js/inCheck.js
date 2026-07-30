@@ -124,7 +124,7 @@
         }
 
         // 规则 2：文件扩展名检查
-        const validExts = ['.jpg', '.png', '.svg'];
+        const validExts = ['.jpg', '.jpeg', '.JPG', '.JPEG', '.png', '.PNG', '.svg', '.SVG', '.webp', '.WEBP'];
         const hasValidExt = validExts.some(ext => val.toLowerCase().endsWith(ext));
 
         if (!hasValidExt) {
@@ -197,24 +197,26 @@
         // 清除之前的状态
         input.classList.remove('error', 'warning');
 
+        // 尝试查找提示容器
+        const hintElement = input.parentElement.querySelector('.mtl-form-hint');
+        if (!hintElement) return;
+
+        // 保存默认提示文本（首次调用）
+        if (!hintElement.dataset.defaultHint) {
+            hintElement.dataset.defaultHint = hintElement.textContent;
+        }
+
         if (!result.valid) {
             // 根据消息严重性决定样式
             const isError = result.msg.includes('不能为空');
             input.classList.add(isError ? 'error' : 'warning');
 
-            // 尝试查找提示容器
-            const hintElement = input.parentElement.querySelector('.mtl-form-hint');
-            if (hintElement) {
-                hintElement.textContent = result.msg;
-                hintElement.className = 'mtl-form-hint ' + (isError ? 'error' : 'warning');
-            }
+            hintElement.textContent = result.msg;
+            hintElement.className = 'mtl-form-hint ' + (isError ? 'error' : 'warning');
         } else {
-            // 清除提示
-            const hintElement = input.parentElement.querySelector('.mtl-form-hint');
-            if (hintElement) {
-                hintElement.textContent = '';
-                hintElement.className = 'mtl-form-hint';
-            }
+            // 恢复默认提示文本
+            hintElement.textContent = hintElement.dataset.defaultHint;
+            hintElement.className = 'mtl-form-hint';
         }
     }
 

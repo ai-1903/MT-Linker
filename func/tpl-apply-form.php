@@ -81,7 +81,7 @@ $statusOptions = [
                     检测
                 </button>
             </div>
-            <div class="mtl-form-hint"></div>
+            <div class="mtl-form-hint" id="linkHint">请输入站点链接，如 https://example.com</div>
             <div class="mtl-ping-result" id="pingResult" style="display: none;"></div>
         </div>
 
@@ -94,7 +94,7 @@ $statusOptions = [
                    placeholder="https://example.com/icon.png"
                    value="<?php echo esc_html($_POST['icon'] ?? ''); ?>"
                    required>
-            <div class="mtl-form-hint"></div>
+            <div class="mtl-form-hint" id="iconHint">请输入站点图标地址，支持 .jpg/.png/.svg/.webp</div>
         </div>
 
         <div class="mtl-form-group">
@@ -147,16 +147,16 @@ $statusOptions = [
 
     <!-- 预览卡片（右侧，min-width 320px） -->
     <div class="mtl-apply-preview">
-        <a href="https://apple.com.cn"
+        <a href="https://example.com"
            class="mtl-card"
            id="previewCard"
            target="_blank"
            rel="noopener noreferrer"
-           style="--mtl-color-args: 255 128 64 / 0.8; --mtl-icon-url: url(https://www.apple.com.cn/ac/structured-data/images/knowledge_graph_logo.png?202410141441);">
+           style="--mtl-color-args: 255 128 64 / 0.8; --mtl-icon-url: url(https://dummyimage.com/200x200/000/fff&text=Demo);">
 
             <div class="mtl-card-body">
                 <div class="mtl-card-info">
-                    <h3 class="mtl-card-name" id="previewName">Apple</h3>
+                    <h3 class="mtl-card-name" id="previewName">Link Title</h3>
                     <p class="mtl-card-des" id="previewDes">这是一个链接卡片的预览示例</p>
                 </div>
             </div>
@@ -188,12 +188,12 @@ $statusOptions = [
         var card = document.getElementById('previewCard');
 
         document.getElementById('previewName').textContent =
-            document.getElementById('name').value || 'Apple';
+            document.getElementById('name').value || 'Link Title';
 
         document.getElementById('previewDes').textContent =
             document.getElementById('des').value || '这是一个链接卡片的预览示例';
 
-        card.href = document.getElementById('link').value || 'https://apple.com.cn';
+        card.href = document.getElementById('link').value || 'https://example.com';
 
         var r = document.getElementById('colorR').value || 0;
         var g = document.getElementById('colorG').value || 199;
@@ -210,7 +210,7 @@ $statusOptions = [
         document.getElementById('colorFinal').value = colorString;
 
         var iconUrl = document.getElementById('icon').value
-            || 'https://www.apple.com.cn/ac/structured-data/images/knowledge_graph_logo.png?202410141441';
+            || 'https://dummyimage.com/200x200/000/fff&text=Demo';
         card.style.setProperty('--mtl-icon-url', 'url(' + iconUrl + ')');
     }
 
@@ -247,16 +247,25 @@ $statusOptions = [
             // 【新增】：针对 HTTP 不安全协议的专属警告注入
             if (id === 'link') {
                 var urlVal = el.value.trim().toLowerCase();
+                var rowDiv = el.closest('.mtl-input-row');
+                var hintEl = rowDiv ? rowDiv.nextElementSibling : null;
                 if (urlVal.startsWith('http://')) {
-                    // 添加黄色边框警告状态
                     el.classList.add('warning');
-
-                    // 安全获取紧邻的 hint 容器并支持 HTML 标签（由于需要加粗样式）
-                    var rowDiv = el.closest('.mtl-input-row');
-                    var hintEl = rowDiv ? rowDiv.nextElementSibling : null;
                     if (hintEl && hintEl.classList.contains('mtl-form-hint')) {
                         hintEl.className = 'mtl-form-hint warning';
                         hintEl.innerHTML = '按照网络安全规范，HTTPS 是现在更安全的一种链接方式。请在配置为 TLS 1.2 或更高的受信任证书之后，按照要求填写 HTTPS 链接。<strong>伪造的 HTTPS 链接可能会被屏蔽处理。</strong>';
+                    }
+                } else if (!result.valid) {
+                    el.classList.add('warning');
+                    if (hintEl && hintEl.classList.contains('mtl-form-hint')) {
+                        hintEl.className = 'mtl-form-hint warning';
+                        hintEl.textContent = result.msg;
+                    }
+                } else if (result.valid) {
+                    el.classList.remove('warning');
+                    if (hintEl && hintEl.classList.contains('mtl-form-hint')) {
+                        hintEl.className = 'mtl-form-hint';
+                        hintEl.textContent = hintEl.dataset.defaultHint || '请输入站点链接，如 https://example.com';
                     }
                 }
             }
