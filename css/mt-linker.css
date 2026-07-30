@@ -392,9 +392,10 @@ iconify-icon {
 
 .mtl-table {
     width: 100%;
-    min-width: 960px;
+    min-width: 1400px;
     border-collapse: collapse;
     font-size: 14px;
+    background: transparent;
 }
 
 .mtl-table thead {
@@ -414,8 +415,12 @@ iconify-icon {
     color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100));
 }
 
-.mtl-table tbody tr:hover {
-    background: rgba(var(--adt-colorBoard-Label) / 0.03);
+.mtl-table tbody tr:nth-child(even) {
+    background: rgba(var(--adt-colorBoard-Label) / 0.07);
+}
+
+.mtl-table tbody tr.editing {
+    background: rgba(var(--adt-colorBoard-Yellow) / 0.08) !important;
 }
 
 .mtl-table input,
@@ -427,6 +432,15 @@ iconify-icon {
     font-size: 14px;
     background: transparent;
     color: inherit;
+}
+
+.mtl-table input[type="text"],
+.mtl-table input[type="url"] {
+    min-width: 120px;
+}
+
+.mtl-table textarea {
+    min-width: 200px;
 }
 
 .mtl-table input:focus,
@@ -830,11 +844,12 @@ iconify-icon {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     z-index: 1000;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .mtl-modal.show {
@@ -873,13 +888,44 @@ iconify-icon {
     background: rgba(var(--adt-colorBoard-Label) / 0.1);
     border-radius: 8px;
     font-size: 24px;
-    line-height: 1;
+    line-height: normal;
     cursor: pointer;
     transition: all 0.2s;
     color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-65));
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .mtl-modal-close:hover {
     background: rgba(var(--adt-colorBoard-Red) / 0.1);
     color: rgba(var(--adt-colorBoard-Red) / var(--adt-colorAlpha-100));
+}
+
+/* ================================================================
+   Dashboard Table — 右侧列固定与防透视穿帮
+   ================================================================ */
+
+.mtl-table th:last-child,
+.mtl-table td:last-child {
+    position: sticky;
+    right: 0;
+    background: var(--card-bg, rgba(255, 255, 255, 0.72));
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 隔行变色行的固定列需要继承背景 */
+.mtl-table tbody tr:nth-child(even) td:last-child {
+    background: rgba(var(--adt-colorBoard-Label) / 0.07);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+}
+
+/* 编辑状态行的固定列需要继承黄色背景 */
+.mtl-table tbody tr.editing td:last-child {
+    background: rgba(var(--adt-colorBoard-Yellow) / 0.08) !important;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
 }
