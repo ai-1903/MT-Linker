@@ -1,15 +1,22 @@
-<!--
-Copyright (c) 2026 iCerya (icerya.com). All Rights Reserved.
+<?php
+/**
+ * MT-Linker Demo — 开箱即用
+ *
+ * PHP 内置服务器路由脚本：
+ *   php -S localhost:8080 index.php
+ *
+ * Demo 模式：默认具有管理员权限
+ */
 
-Released under the MIT License.
-See LICENSE file in the project root for full license text.
+// ---- 静态资源直出（PHP 内置服务器路由）------------------------------------
+$requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$ext = strtolower(pathinfo($requestPath, PATHINFO_EXTENSION));
+$staticExts = ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'ico', 'woff', 'woff2', 'ttf', 'eot', 'webp', 'json', 'xml'];
+if (in_array($ext, $staticExts) && file_exists(__DIR__ . $requestPath)) {
+    return false; // PHP 内置服务器将直接返回该文件
+}
 
-@package   MT-Linker
-@author    iCerya
-@link      https://icerya.com
--->
-
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="zh-CN" data-color-mode="light">
 <head>
     <meta charset="UTF-8">
@@ -125,9 +132,9 @@ See LICENSE file in the project root for full license text.
     echo '<h2 style="margin-bottom: 20px;">MT-Linker Demo</h2>';
     echo '<p style="margin-bottom: 20px; color: var(--text-secondary);">选择要预览的页面：</p>';
     echo '<div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">';
-    echo '<a href="?page=linker" style="padding: 12px 24px; background: rgba(var(--adt-colorBoard-Blue), 1); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">链接展示</a>';
-    echo '<a href="?page=apply" style="padding: 12px 24px; background: rgba(var(--adt-colorBoard-Green), 1); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">申请友链</a>';
-    echo '<a href="?page=dash" style="padding: 12px 24px; background: rgba(var(--adt-colorBoard-Orange), 1); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">管理面板</a>';
+    echo '<a href="?page=linker" style="padding: 12px 24px; background: rgba(var(--adt-colorBoard-Label)/ 1); color: rgba(var(--adt-colorBoard-buttonLabel)/ 1); border-radius: 12px; text-decoration: none; font-weight: 600;">链接展示</a>';
+    echo '<a href="?page=apply" style="padding: 12px 24px; background: rgba(var(--adt-colorBoard-Label)/ 1); color: rgba(var(--adt-colorBoard-buttonLabel)/ 1); border-radius: 12px; text-decoration: none; font-weight: 600;">申请友链</a>';
+    echo '<a href="?page=dash" style="padding: 12px 24px; background: rgba(var(--adt-colorBoard-Label)/ 1); color: rgba(var(--adt-colorBoard-buttonLabel)/ 1); border-radius: 12px; text-decoration: none; font-weight: 600;">管理面板</a>';
     echo '</div>';
     echo '</div>';
 

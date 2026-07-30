@@ -226,7 +226,9 @@ $typeOptions = [
     <div class="mtl-modal-content">
         <div class="mtl-modal-header">
             <h2>添加新链接</h2>
-            <button class="mtl-modal-close" onclick="hideAddModal()">&times;</button>
+            <button class="mtl-modal-close" onclick="hideAddModal()">
+                <iconify-icon icon="fluent:dismiss-24-regular"></iconify-icon>
+            </button>
         </div>
         <?php
             $is_dash_mode = true;

@@ -435,10 +435,20 @@ iconify-icon {
     background: transparent;
     color: inherit;
     line-height: 1.5;
+    box-sizing: border-box;
 }
 
+.mtl-table input[type="text"],
+.mtl-table input[type="url"],
+.mtl-table input[type="number"],
 .mtl-table select {
-    height: auto;
+    height: 34px;
+    border-radius: 8px;
+}
+
+.mtl-table textarea {
+    resize: vertical;
+    min-height: 34px;
 }
 
 .mtl-table textarea {
@@ -854,8 +864,15 @@ iconify-icon {
 }
 
 .mtl-actions {
-    display: flex;
-    gap: 8px;
+    white-space: nowrap;
+}
+
+.mtl-actions .mtl-btn {
+    margin-right: 8px;
+}
+
+.mtl-actions .mtl-btn:last-child {
+    margin-right: 0;
 }
 
 .mtl-btn-edit {
@@ -904,6 +921,15 @@ iconify-icon {
     align-items: center;
     padding: 24px 32px;
     border-bottom: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.13);
+
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(var(--adt-colorBoard-Background) / 0.65);
+    backdrop-filter: blur(23px) saturate(180%);
+    -webkit-backdrop-filter: blur(23px) saturate(180%);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
 }
 
 .mtl-modal-header h2 {

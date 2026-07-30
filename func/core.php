@@ -27,15 +27,20 @@ define('MTLINKER_CONFIG', MTLINKER_BASE . '/mtklink-config.yml');
 // =========================================================================
 // YAML 配置加载器（简单实现，仅支持基础键值对）
 // =========================================================================
-function mtlinker_load_config() {
+function mtlinker_load_config($reload = false) {
     static $config = null;
+
+    if ($reload) {
+        $config = null;
+    }
 
     if ($config !== null) {
         return $config;
     }
 
     if (!file_exists(MTLINKER_CONFIG)) {
-        return [];
+        $config = [];
+        return $config;
     }
 
     $content = file_get_contents(MTLINKER_CONFIG);
@@ -68,7 +73,8 @@ function mtlinker_update_config($key, $value) {
     }
 
     try {
-        $config = mtlinker_load_config();
+        // 强制重新加载配置（绕过静态缓存）
+        $config = mtlinker_load_config(true);
         $config[$key] = $value;
 
         $lines = ["# MT-Linker Configuration", "# ========================", "# This file stores environment-specific configuration.", "# Do NOT commit this file with sensitive data to version control.", ""];
@@ -82,8 +88,20 @@ function mtlinker_update_config($key, $value) {
         $lines[] = "# SQLite credentials (auto-generated, do not modify manually)";
         $lines[] = "sqlite-user: \"" . ($config['sqlite-user'] ?? '') . "\"";
         $lines[] = "sqlite-key: \"" . ($config['sqlite-key'] ?? '') . "\"";
+        $lines[] = "";
+        $lines[] = "# Input validation settings";
+        $lines[] = "incheck_focusHTTPS: \"" . ($config['incheck_focusHTTPS'] ?? '1') . "\"";
+        $lines[] = "incheck_DOMAIN: \"" . ($config['incheck_DOMAIN'] ?? '1') . "\"";
+        $lines[] = "incheck_colorAlpha: \"" . ($config['incheck_colorAlpha'] ?? '1') . "\"";
 
         $result = file_put_contents(MTLINKER_CONFIG, implode("\n", $lines) . "\n", LOCK_EX);
+
+        // 写入后刷新缓存
+        mtlinker_load_config(true);
+
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        @unlink($lockFile);
 
         flock($fp, LOCK_UN);
         fclose($fp);
@@ -99,12 +117,43 @@ function mtlinker_update_config($key, $value) {
 }
 
 // =========================================================================
+// 批量写入完整配置（绕过 key-by-key 更新）
+// =========================================================================
+function mtlinker_write_full_config(array $overrides = []) {
+    $config = mtlinker_load_config(true);
+    foreach ($overrides as $k => $v) {
+        $config[$k] = $v;
+    }
+
+    $lines = ["# MT-Linker Configuration", "# ========================", "# This file stores environment-specific configuration.", "# Do NOT commit this file with sensitive data to version control.", ""];
+    $lines[] = "# Authentication type: \"wp\" | \"mtk\" | \"adt\" | \"none\"";
+    $lines[] = "type: \"" . ($config['type'] ?? 'none') . "\"";
+    $lines[] = "";
+    $lines[] = "# For type=\"none\": Custom authentication endpoint and key";
+    $lines[] = "auth: \"" . ($config['auth'] ?? '') . "\"";
+    $lines[] = "key: \"" . ($config['key'] ?? '') . "\"";
+    $lines[] = "";
+    $lines[] = "# SQLite credentials (auto-generated, do not modify manually)";
+    $lines[] = "sqlite-user: \"" . ($config['sqlite-user'] ?? '') . "\"";
+    $lines[] = "sqlite-key: \"" . ($config['sqlite-key'] ?? '') . "\"";
+    $lines[] = "";
+    $lines[] = "# Input validation settings";
+    $lines[] = "incheck_focusHTTPS: \"" . ($config['incheck_focusHTTPS'] ?? '1') . "\"";
+    $lines[] = "incheck_DOMAIN: \"" . ($config['incheck_DOMAIN'] ?? '1') . "\"";
+    $lines[] = "incheck_colorAlpha: \"" . ($config['incheck_colorAlpha'] ?? '1') . "\"";
+
+    $result = file_put_contents(MTLINKER_CONFIG, implode("\n", $lines) . "\n", LOCK_EX);
+    mtlinker_load_config(true); // 刷新缓存
+    return $result !== false;
+}
+
+// =========================================================================
 // SQLite 数据库初始化（无感自动生成密钥）
 // =========================================================================
 function mtlinker_init_database() {
-    $config = mtlinker_load_config();
+    $config = mtlinker_load_config(true);
 
-    // 检查是否已初始化
+    // 检查是否已完全初始化
     if (!empty($config['sqlite-user']) && !empty($config['sqlite-key'])) {
         return true;
     }
@@ -113,9 +162,14 @@ function mtlinker_init_database() {
     $sqliteUser = bin2hex(random_bytes(16));
     $sqliteKey = bin2hex(random_bytes(32));
 
-    // 写入配置
-    mtlinker_update_config('sqlite-user', $sqliteUser);
-    mtlinker_update_config('sqlite-key', $sqliteKey);
+    // 一次性写入完整配置（避免两次调用间缓存不一致）
+    $existingUser = $config['sqlite-user'] ?? '';
+    $existingKey  = $config['sqlite-key'] ?? '';
+
+    mtlinker_write_full_config([
+        'sqlite-user' => !empty($existingUser) ? $existingUser : $sqliteUser,
+        'sqlite-key'  => !empty($existingKey) ? $existingKey : $sqliteKey,
+    ]);
 
     // 创建数据库文件
     $dbPath = MTLINKER_DATA . '/mtlinker.db';

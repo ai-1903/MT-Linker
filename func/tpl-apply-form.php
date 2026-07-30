@@ -147,7 +147,7 @@ $statusOptions = [
 
             <div class="mtl-card-body">
                 <div class="mtl-card-info">
-                    <h3 class="mtl-card-name" id="previewName">示例站点</h3>
+                    <h3 class="mtl-card-name" id="previewName">Apple</h3>
                     <p class="mtl-card-des" id="previewDes">这是一个链接卡片的预览示例</p>
                 </div>
 
@@ -161,7 +161,7 @@ $statusOptions = [
 
             <div class="mtl-card-footer">
                 <div class="mtl-card-status">
-                    <span class="mtl-status-text status-ok" id="previewStatusText">· 连通正常</span>
+                    <span class="mtl-status-text status-ok" id="previewStatusText"><span class="mtl-ping-dot status-ok"></span> 连通正常</span>
                 </div>
                 <div class="mtl-card-timestamp" id="previewTimestamp">刚刚</div>
             </div>
