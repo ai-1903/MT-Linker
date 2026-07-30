@@ -1,3 +1,5 @@
+<div align="center">
+
 # MT-Linker
 
 **A friendship Linker for MT-Kit** — 优雅的友情链接管理组件
@@ -5,6 +7,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-7.4+-purple.svg)](https://www.php.net/)
 [![WordPress](https://img.shields.io/badge/WordPress-5.0+-green.svg)](https://wordpress.org/)
+</div>
 
 ---
 
@@ -244,8 +247,10 @@ MIT License - Copyright (c) 2026 iCerya
 
 - **MT-Kit**: 多工具集成套件（开发中）
 - **AirDesign Tools**: 设计工具集（开发中）
-- **trailblazerUI**: 开拓之旅 UI 组件
+- **trailblazerUI**: 拓星旅迹 UI 组件
 
 ---
 
+<div align="center">
 **Made with ❤️ by [iCerya](https://icerya.com)**
+</div>
