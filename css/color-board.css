@@ -42,6 +42,7 @@
     --adt-colorBoard-Success: 52 199 89;
     --adt-colorBoard-Note: 0 122 255;
     --adt-colorBoard-Info: 0 122 255;
+    --adt-colorBoard-Middle: 128 128 128;
     --adt-colorBoard-Important: 88 86 214;
 
     /* 透明度阶梯 */
@@ -66,7 +67,7 @@
     --adt-colorBoard-Indigo: 94 92 230;
     --adt-colorBoard-Purple: 191 90 242;
     --adt-colorBoard-Pink: 255 55 95;
-    --adt-colorBoard-Brown: 172 142 104;
+    --adt-colorBoard-Gray: 172 142 104;
 
     /* 语义色 */
     --adt-colorBoard-Label: 255 255 255;
@@ -82,5 +83,6 @@
     --adt-colorBoard-Success: 48 209 88;
     --adt-colorBoard-Note: 10 132 255;
     --adt-colorBoard-Info: 10 132 255;
+    --adt-colorBoard-Middle: 128 128 128;
     --adt-colorBoard-Important: 191 90 242;
 }

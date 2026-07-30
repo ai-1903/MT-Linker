@@ -251,6 +251,6 @@ MIT License - Copyright (c) 2026 iCerya
 
 ---
 
-<div align="center">
-**Made with ❤️ by [iCerya](https://icerya.com)**
-</div>
+<p align="center">
+  <sub>Made with ❤️ by <a href="https://icerya.com">iCerya</a></sub>
+</p>
