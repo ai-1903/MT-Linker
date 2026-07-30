@@ -220,41 +220,36 @@ async function checkAllLinks() {
 
     const cards = document.querySelectorAll('.mtl-card');
 
-    for (const card of cards) {
+    cards.forEach(card => {
         const url = card.getAttribute('href');
         const pingDot = card.querySelector('.mtl-card-ping .mtl-ping-dot');
         const pingTime = card.querySelector('.mtl-card-ping span:last-child');
         const statusText = card.querySelector('.mtl-status-text');
         const timestamp = card.querySelector('.mtl-card-timestamp');
 
-        // 重置状态
+        // 重置为检查中状态
         pingDot.className = 'mtl-ping-dot status-checking';
         pingTime.textContent = '检测中...';
-        if (statusText) statusText.textContent = '· 正在检查';
+        if (statusText) { statusText.textContent = '· 正在检查'; }
 
-        // 执行 ping
-        const result = await pingUrl(url);
+        // 并发检测，谁测完谁更新
+        pingUrl(url).then(result => {
+            if (result.success) {
+                pingDot.className = 'mtl-ping-dot status-ok';
+                pingTime.textContent = `${result.time}ms`;
+                if (statusText) { statusText.className = 'mtl-status-text status-ok'; statusText.textContent = '· 连通正常'; }
+            } else {
+                pingDot.className = 'mtl-ping-dot status-error';
+                pingTime.textContent = '超时';
+                if (statusText) { statusText.className = 'mtl-status-text status-error'; statusText.textContent = '· 连接失败'; }
+            }
 
-        if (result.success) {
-            pingDot.className = 'mtl-ping-dot status-ok';
-            pingTime.textContent = `${result.time}ms`;
-            if (statusText) { statusText.className = 'mtl-status-text status-ok'; statusText.textContent = '· 连通正常'; }
-        } else {
-            pingDot.className = 'mtl-ping-dot status-error';
-            pingTime.textContent = '超时';
-            if (statusText) { statusText.className = 'mtl-status-text status-error'; statusText.textContent = '· 连接失败'; }
-        }
-
-        // 更新时间戳
-        const currentTime = new Date();
-        timestamp.textContent = currentTime.toLocaleTimeString('zh-CN', {
-            hour: '2-digit',
-            minute: '2-digit'
+            timestamp.textContent = new Date().toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         });
-
-        // 添加短暂延迟避免请求过于密集
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
+    });
 }
 
 // 页面加载时检查冷却
