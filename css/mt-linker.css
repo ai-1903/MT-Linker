@@ -393,7 +393,8 @@ iconify-icon {
 .mtl-table {
     width: 100%;
     min-width: 1400px;
-    border-collapse: collapse;
+    border-collapse: separate; 
+    border-spacing: 0; 
     font-size: 14px;
     background: transparent;
 }
@@ -415,8 +416,8 @@ iconify-icon {
     color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100));
 }
 
-.mtl-table tbody tr:nth-child(even) {
-    background: rgba(var(--adt-colorBoard-Label) / 0.07);
+.mtl-table tbody tr:hover {
+    background: rgba(var(--adt-colorBoard-Label) / 0.03);
 }
 
 .mtl-table tbody tr.editing {
@@ -951,9 +952,9 @@ iconify-icon {
     z-index: 11;
 }
 
-/* 隔行变色行的固定列需要继承背景 */
-.mtl-table tbody tr:nth-child(even) td:last-child {
-    background: rgba(var(--adt-colorBoard-Label) / 0.07);
+/* 悬停行的固定列需要继承背景 */
+.mtl-table tbody tr:hover td:last-child {
+    background: rgba(var(--adt-colorBoard-Label) / 0.03);
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
 }
@@ -966,6 +967,6 @@ iconify-icon {
 }
 
 /* 默认状态的固定列使用主背景色 */
-.mtl-table tbody tr:not(.editing):not(:nth-child(even)) td:last-child {
+.mtl-table tbody tr:not(.editing):not(:hover) td:last-child {
     background: rgba(var(--adt-colorBoard-Background) / 1);
 }
