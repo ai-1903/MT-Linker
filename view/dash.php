@@ -149,13 +149,13 @@ $typeOptions = [
                     <?php foreach ($pending as $item): ?>
                         <tr data-id="<?php echo $item['NO']; ?>">
                             <td class="mtl-readonly"><?php echo $item['NO']; ?></td>
-                            <td class="mtl-editable" data-field="name"><?php echo esc_html($item['Name']); ?></td>
-                            <td class="mtl-editable" data-field="des"><?php echo esc_html($item['Des']); ?></td>
-                            <td class="mtl-editable" data-field="type"><?php echo $typeOptions[$item['type']]; ?></td>
-                            <td class="mtl-editable" data-field="link"><a href="<?php echo esc_url($item['Link']); ?>" target="_blank"><?php echo esc_html($item['Link']); ?></a></td>
-                            <td class="mtl-editable" data-field="icon"><img src="<?php echo esc_url($item['icon']); ?>" width="24" height="24"></td>
-                            <td class="mtl-editable" data-field="color"><div class="mtl-color-preview" style="background:rgba(<?php echo esc_html($item['color']); ?>);"></div></td>
-                            <td class="mtl-editable" data-field="status"><?php echo $statusOptions[$item['status']]; ?></td>
+                            <td class="mtl-editable" data-field="name" data-val="<?php echo esc_attr($item['Name']); ?>"><?php echo esc_html($item['Name']); ?></td>
+                            <td class="mtl-editable" data-field="des" data-val="<?php echo esc_attr($item['Des']); ?>"><?php echo esc_html($item['Des']); ?></td>
+                            <td class="mtl-editable" data-field="type" data-val="<?php echo esc_attr($item['type']); ?>"><?php echo $typeOptions[$item['type']]; ?></td>
+                            <td class="mtl-editable" data-field="link" data-val="<?php echo esc_attr($item['Link']); ?>"><a href="<?php echo esc_url($item['Link']); ?>" target="_blank"><?php echo esc_html($item['Link']); ?></a></td>
+                            <td class="mtl-editable" data-field="icon" data-val="<?php echo esc_attr($item['icon']); ?>"><img src="<?php echo esc_url($item['icon']); ?>" width="24" height="24"></td>
+                            <td class="mtl-editable" data-field="color" data-val="<?php echo esc_attr($item['color']); ?>"><div class="mtl-color-preview" style="background:rgb(<?php echo esc_attr($item['color']); ?>);"></div></td>
+                            <td class="mtl-editable" data-field="status" data-val="<?php echo esc_attr($item['status']); ?>"><?php echo $statusOptions[$item['status']]; ?></td>
                             <td class="mtl-actions">
                                 <button class="mtl-btn mtl-btn-edit" onclick="editRow(this)">编辑</button>
                                 <button class="mtl-btn mtl-btn-delete" onclick="deleteRow(<?php echo $item['NO']; ?>, '<?php echo esc_js($item['Name']); ?>')">删除</button>
@@ -187,13 +187,13 @@ $typeOptions = [
                     <?php foreach ($others as $item): ?>
                         <tr data-id="<?php echo $item['NO']; ?>">
                             <td class="mtl-readonly"><?php echo $item['NO']; ?></td>
-                            <td class="mtl-editable" data-field="name"><?php echo esc_html($item['Name']); ?></td>
-                            <td class="mtl-editable" data-field="des"><?php echo esc_html($item['Des']); ?></td>
-                            <td class="mtl-editable" data-field="type"><?php echo $typeOptions[$item['type']]; ?></td>
-                            <td class="mtl-editable" data-field="link"><a href="<?php echo esc_url($item['Link']); ?>" target="_blank"><?php echo esc_html($item['Link']); ?></a></td>
-                            <td class="mtl-editable" data-field="icon"><img src="<?php echo esc_url($item['icon']); ?>" width="24" height="24"></td>
-                            <td class="mtl-editable" data-field="color"><div class="mtl-color-preview" style="background:rgba(<?php echo esc_html($item['color']); ?>);"></div></td>
-                            <td class="mtl-editable" data-field="status"><?php echo $statusOptions[$item['status']]; ?></td>
+                            <td class="mtl-editable" data-field="name" data-val="<?php echo esc_attr($item['Name']); ?>"><?php echo esc_html($item['Name']); ?></td>
+                            <td class="mtl-editable" data-field="des" data-val="<?php echo esc_attr($item['Des']); ?>"><?php echo esc_html($item['Des']); ?></td>
+                            <td class="mtl-editable" data-field="type" data-val="<?php echo esc_attr($item['type']); ?>"><?php echo $typeOptions[$item['type']]; ?></td>
+                            <td class="mtl-editable" data-field="link" data-val="<?php echo esc_attr($item['Link']); ?>"><a href="<?php echo esc_url($item['Link']); ?>" target="_blank"><?php echo esc_html($item['Link']); ?></a></td>
+                            <td class="mtl-editable" data-field="icon" data-val="<?php echo esc_attr($item['icon']); ?>"><img src="<?php echo esc_url($item['icon']); ?>" width="24" height="24"></td>
+                            <td class="mtl-editable" data-field="color" data-val="<?php echo esc_attr($item['color']); ?>"><div class="mtl-color-preview" style="background:rgb(<?php echo esc_attr($item['color']); ?>);"></div></td>
+                            <td class="mtl-editable" data-field="status" data-val="<?php echo esc_attr($item['status']); ?>"><?php echo $statusOptions[$item['status']]; ?></td>
                             <td class="mtl-actions">
                                 <button class="mtl-btn mtl-btn-edit" onclick="editRow(this)">编辑</button>
                                 <button class="mtl-btn mtl-btn-delete" onclick="deleteRow(<?php echo $item['NO']; ?>, '<?php echo esc_js($item['Name']); ?>')">删除</button>
@@ -283,6 +283,24 @@ function enterEditMode(row, btn) {
     btn.classList.add('saving');
 
     const id = row.dataset.id;
+
+    // 备份原始 HTML 和操作按钮，为"取消"做准备
+    row.querySelectorAll('.mtl-editable').forEach(cell => {
+        if (cell.dataset.originalHtml === undefined) {
+            cell.dataset.originalHtml = cell.innerHTML;
+        }
+    });
+
+    // 把红色删除按钮改成取消
+    const actionsCell = row.querySelector('.mtl-actions');
+    const deleteBtn = actionsCell.querySelector('.mtl-btn-delete');
+    if (deleteBtn) {
+        deleteBtn.dataset.origText = deleteBtn.textContent;
+        deleteBtn.dataset.origClick = deleteBtn.getAttribute('onclick');
+        deleteBtn.textContent = '取消';
+        deleteBtn.classList.replace('mtl-btn-delete', 'mtl-btn-secondary');
+        deleteBtn.setAttribute('onclick', 'cancelEditMode(this)');
+    }
 
     row.querySelectorAll('.mtl-editable').forEach(cell => {
         const field = cell.dataset.field;
@@ -468,6 +486,11 @@ function validateAndSaveRow(row, btn) {
 }
 
 function extractValue(cell, field) {
+    // 优先走 data-val 绿色通道，彻底消灭玄学解析
+    if (cell.hasAttribute('data-val')) {
+        return cell.getAttribute('data-val');
+    }
+    // 旧逻辑兜底
     if (field === 'link') {
         const a = cell.querySelector('a');
         return a ? a.getAttribute('href') : '';
@@ -485,5 +508,31 @@ function extractValue(cell, field) {
     } else {
         return cell.textContent.trim();
     }
+}
+
+// 取消编辑模式：全数滚回复原
+function cancelEditMode(cancelBtn) {
+    const row = cancelBtn.closest('tr');
+    row.classList.remove('editing');
+
+    // 挨个恢复单元格原始样貌
+    row.querySelectorAll('.mtl-editable').forEach(cell => {
+        if (cell.dataset.originalHtml !== undefined) {
+            cell.innerHTML = cell.dataset.originalHtml;
+        }
+    });
+
+    // 恢复编辑/保存按钮
+    const actionsCell = row.querySelector('.mtl-actions');
+    const saveBtn = actionsCell.querySelector('.mtl-btn-edit');
+    if (saveBtn) {
+        saveBtn.textContent = '编辑';
+        saveBtn.classList.remove('saving');
+    }
+
+    // 把取消按钮变回红色删除
+    cancelBtn.textContent = cancelBtn.dataset.origText;
+    cancelBtn.classList.replace('mtl-btn-secondary', 'mtl-btn-delete');
+    cancelBtn.setAttribute('onclick', cancelBtn.dataset.origClick);
 }
 </script>
