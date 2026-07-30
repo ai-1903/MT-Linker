@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mtl_apply_submit'])) 
                    id="previewCard"
                    target="_blank"
                    rel="noopener noreferrer"
-                   style="--mtl-r: 255; --mtl-g: 128; --mtl-b: 64; --mtl-a: 0.8; --mtl-icon-url: url(https://www.apple.com.cn/ac/structured-data/images/knowledge_graph_logo.png?202410141441);">
+                   style="--mtl-color-args: 255 128 64 / 0.8; --mtl-icon-url: url(https://www.apple.com.cn/ac/structured-data/images/knowledge_graph_logo.png?202410141441);">
 
                     <div class="mtl-card-body">
                         <div class="mtl-card-info">
@@ -229,16 +229,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mtl_apply_submit'])) 
             ? (document.getElementById('colorA') ? (document.getElementById('colorA').value || 1) : 1)
             : 1;
 
-        card.style.setProperty('--mtl-r', r);
-        card.style.setProperty('--mtl-g', g);
-        card.style.setProperty('--mtl-b', b);
-        card.style.setProperty('--mtl-a', a);
+        // 合并颜色字符串
+        var colorString = r + ' ' + g + ' ' + b + ' / ' + a;
+        // 赋予 CSS 变量
+        card.style.setProperty('--mtl-color-args', colorString);
+        // 赋予隐藏的表单 Input
+        document.getElementById('colorFinal').value = colorString;
 
         var iconUrl = document.getElementById('icon').value
             || 'https://www.apple.com.cn/ac/structured-data/images/knowledge_graph_logo.png?202410141441';
         card.style.setProperty('--mtl-icon-url', 'url(' + iconUrl + ')');
-
-        document.getElementById('colorFinal').value = r + ' ' + g + ' ' + b + ' / ' + a;
     }
 
     // ---- 前端校验（纯视觉提示，不阻塞提交）----

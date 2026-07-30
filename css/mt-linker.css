@@ -234,7 +234,7 @@ iconify-icon {
 .mtl-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-    border-color: rgba(var(--mtl-r), var(--mtl-g), var(--mtl-b) / var(--mtl-a, 0.6));
+    border-color: rgb(var(--mtl-color-args, 128 128 128 / 0.6));
 }
 
 .mtl-card:active {

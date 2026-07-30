@@ -112,20 +112,12 @@ $statusNames = [
                         <h3 class="mtl-section-subtitle"><?php echo esc_html($statusNames[$status]); ?></h3>
                         <div class="mtl-cards-grid">
                             <?php foreach ($byStatus[$status] as $linker):
-                                    // 解析颜色: "R G B / A"
-                                    $colorRaw = $linker['color'] ?? '128 128 128 / 0.4';
-                                    $colorParts = explode('/', $colorRaw);
-                                    $rgb = explode(' ', trim($colorParts[0]));
-                                    $r = trim($rgb[0] ?? '128');
-                                    $g = trim($rgb[1] ?? '128');
-                                    $b = trim($rgb[2] ?? '128');
-                                    $a = isset($colorParts[1]) ? trim($colorParts[1]) : '0.6';
                                 ?>
                                 <a href="<?php echo esc_url($linker['Link']); ?>"
                                    class="mtl-card"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   style="--mtl-r: <?php echo esc_html($r); ?>; --mtl-g: <?php echo esc_html($g); ?>; --mtl-b: <?php echo esc_html($b); ?>; --mtl-a: <?php echo esc_html($a); ?>; --mtl-icon-url: url(<?php echo esc_url($linker['icon']); ?>);">
+                                   style="--mtl-color-args: <?php echo esc_html($linker['color'] ?? '128 128 128 / 0.4'); ?>; --mtl-icon-url: url(<?php echo esc_url($linker['icon']); ?>);">
 
                                     <div class="mtl-card-body">
                                         <div class="mtl-card-info">
