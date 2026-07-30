@@ -845,7 +845,7 @@ iconify-icon {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 999999;
+    z-index: 1000;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(4px);
@@ -914,11 +914,6 @@ iconify-icon {
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
     box-shadow: -4px 0 8px rgba(0, 0, 0, 0.05);
-    z-index: 10;
-}
-
-.mtl-table th:last-child {
-    z-index: 11;
 }
 
 /* 隔行变色行的固定列需要继承背景 */
