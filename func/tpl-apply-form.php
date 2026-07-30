@@ -156,7 +156,7 @@ $statusOptions = [
 
             <div class="mtl-card-footer">
                 <div class="mtl-card-status">
-                    <span class="mtl-status-text status-ok" id="previewStatusText"><iconify-icon icon="mingcute:check-circle-line"></iconify-icon> 42ms 连接成功</span>
+                    <span class="mtl-status-text status-ok" id="previewStatusText"><iconify-icon icon="mingcute:check-circle-line"></iconify-icon> 准备连接</span>
                 </div>
                 <div class="mtl-card-timestamp" id="previewTimestamp">刚刚</div>
             </div>
@@ -179,7 +179,7 @@ $statusOptions = [
         var card = document.getElementById('previewCard');
 
         document.getElementById('previewName').textContent =
-            document.getElementById('name').value || '示例站点';
+            document.getElementById('name').value || 'Apple';
 
         document.getElementById('previewDes').textContent =
             document.getElementById('des').value || '这是一个链接卡片的预览示例';
