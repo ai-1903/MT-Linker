@@ -78,8 +78,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ---- 获取数据 -----------------------------------------------------------
+// 分页参数
+$page = isset($_GET['p']) ? max(1, intval($_GET['p'])) : 1;
+$limit = 13;
+$offset = ($page - 1) * $limit;
+
 $pending = $db->query("SELECT * FROM Linker WHERE status = 0 ORDER BY NO DESC")->fetchAll();
-$others = $db->query("SELECT * FROM Linker WHERE status != 0 ORDER BY status ASC, NO DESC LIMIT 13")->fetchAll();
+
+// 获取总数用于分页
+$totalCount = $db->query("SELECT COUNT(*) FROM Linker WHERE status != 0")->fetchColumn();
+$totalPages = ceil($totalCount / $limit);
+
+// 分页查询
+$stmt = $db->prepare("SELECT * FROM Linker WHERE status != 0 ORDER BY status ASC, NO DESC LIMIT :limit OFFSET :offset");
+$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+$others = $stmt->fetchAll();
+
+// 加载配置（供模板使用）
+$config = mtlinker_load_config();
 
 $statusOptions = [
     0 => '审核中',
@@ -184,6 +202,21 @@ $typeOptions = [
                     <?php endforeach; ?>
                 </tbody>
             </table>
+
+            <!-- 分页器 -->
+            <?php if ($totalPages > 1): ?>
+                <div class="mtl-pagination">
+                    <?php if ($page > 1): ?>
+                        <a href="?page=dash&p=<?php echo $page - 1; ?>" class="mtl-btn">上一页</a>
+                    <?php endif; ?>
+
+                    <span class="mtl-page-info">第 <?php echo $page; ?> / <?php echo $totalPages; ?> 页</span>
+
+                    <?php if ($page < $totalPages): ?>
+                        <a href="?page=dash&p=<?php echo $page + 1; ?>" class="mtl-btn">下一页</a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -191,65 +224,14 @@ $typeOptions = [
 <!-- 添加弹窗 -->
 <div class="mtl-modal" id="addModal">
     <div class="mtl-modal-content">
-        <h2>添加新链接</h2>
-        <form method="POST" id="addForm">
-            <input type="hidden" name="action" value="add">
-
-            <div class="mtl-form-group">
-                <label>名称</label>
-                <input type="text" name="name" required>
-            </div>
-
-            <div class="mtl-form-group">
-                <label>描述</label>
-                <textarea name="des" rows="3" required></textarea>
-            </div>
-
-            <div class="mtl-form-group">
-                <label>类型</label>
-                <select name="type" required>
-                    <?php foreach ($typeOptions as $val => $label): ?>
-                        <option value="<?php echo $val; ?>"><?php echo $label; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="mtl-form-group">
-                <label>链接</label>
-                <input type="url" name="link" required>
-            </div>
-
-            <div class="mtl-form-group">
-                <label>图标</label>
-                <input type="url" name="icon" required>
-            </div>
-
-            <div class="mtl-form-group">
-                <label>颜色 (RGBA)</label>
-                <div class="mtl-color-inputs">
-                    <input type="number" id="addColorR" min="0" max="255" value="0" required>
-                    <input type="number" id="addColorG" min="0" max="255" value="199" required>
-                    <input type="number" id="addColorB" min="0" max="255" value="190" required>
-                    <span>/</span>
-                    <input type="number" id="addColorA" min="0" max="1" step="0.01" value="1" required>
-                </div>
-                <input type="hidden" name="color" id="addColorFinal" value="0 199 190 / 1">
-            </div>
-
-            <div class="mtl-form-group">
-                <label>状态</label>
-                <select name="status" required>
-                    <?php foreach ($statusOptions as $val => $label): ?>
-                        <option value="<?php echo $val; ?>"><?php echo $label; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="mtl-modal-actions">
-                <button type="button" class="mtl-btn" onclick="hideAddModal()">取消</button>
-                <button type="submit" class="mtl-btn mtl-btn-primary">添加</button>
-            </div>
-        </form>
+        <div class="mtl-modal-header">
+            <h2>添加新链接</h2>
+            <button class="mtl-modal-close" onclick="hideAddModal()">&times;</button>
+        </div>
+        <?php
+            $is_dash_mode = true;
+            require __DIR__ . '/../func/tpl-apply-form.php';
+        ?>
     </div>
 </div>
 
@@ -257,6 +239,11 @@ $typeOptions = [
 <script>
 const statusOptions = <?php echo json_encode($statusOptions); ?>;
 const typeOptions = <?php echo json_encode($typeOptions); ?>;
+const config = {
+    focusHTTPS: <?php echo json_encode(($config['incheck_focusHTTPS'] ?? '1') === '1'); ?>,
+    checkDomain: <?php echo json_encode(($config['incheck_DOMAIN'] ?? '1') === '1'); ?>,
+    showAlpha: <?php echo json_encode(($config['incheck_colorAlpha'] ?? '1') === '1'); ?>
+};
 
 function showAddModal() {
     document.getElementById('addModal').classList.add('show');
@@ -265,17 +252,6 @@ function showAddModal() {
 function hideAddModal() {
     document.getElementById('addModal').classList.remove('show');
 }
-
-// 添加表单颜色实时拼接
-['addColorR', 'addColorG', 'addColorB', 'addColorA'].forEach(id => {
-    document.getElementById(id).addEventListener('input', () => {
-        const r = document.getElementById('addColorR').value;
-        const g = document.getElementById('addColorG').value;
-        const b = document.getElementById('addColorB').value;
-        const a = document.getElementById('addColorA').value;
-        document.getElementById('addColorFinal').value = `${r} ${g} ${b} / ${a}`;
-    });
-});
 
 function deleteRow(id, name) {
     const confirmation = prompt(`确认删除？请输入「确认删除${name}」`);
@@ -293,8 +269,8 @@ function editRow(btn) {
     const isEditing = row.classList.contains('editing');
 
     if (isEditing) {
-        // 保存模式
-        saveRow(row, btn);
+        // 保存模式：先校验再提交
+        validateAndSaveRow(row, btn);
     } else {
         // 编辑模式
         enterEditMode(row, btn);
@@ -352,39 +328,78 @@ function enterEditMode(row, btn) {
             `;
             cell.innerHTML = '';
             cell.appendChild(container);
+
+            // 颜色输入实时校验
+            container.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', () => {
+                    const inputs = container.querySelectorAll('input');
+                    const result = window.MTLinkerValidation.validateColor(
+                        inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value, config
+                    );
+                    inputs.forEach(inp => inp.classList.toggle('error', !result.valid));
+                });
+            });
         } else if (field === 'icon') {
             const input = document.createElement('input');
             input.type = 'url';
             input.value = currentValue;
             cell.innerHTML = '';
             cell.appendChild(input);
+
+            // Icon 实时校验
+            input.addEventListener('input', () => {
+                const result = window.MTLinkerValidation.validateIcon(input.value, config);
+                input.classList.toggle('error', !result.valid);
+                input.classList.toggle('warning', !result.valid);
+            });
         } else if (field === 'link') {
             const input = document.createElement('input');
             input.type = 'url';
             input.value = currentValue;
             cell.innerHTML = '';
             cell.appendChild(input);
+
+            // Link 实时校验
+            input.addEventListener('input', () => {
+                const result = window.MTLinkerValidation.validateLink(input.value, config);
+                input.classList.toggle('error', !result.valid);
+                input.classList.toggle('warning', !result.valid);
+            });
         } else if (field === 'des') {
             const textarea = document.createElement('textarea');
             textarea.value = currentValue;
             textarea.rows = 2;
             cell.innerHTML = '';
             cell.appendChild(textarea);
-        } else {
+
+            // Des 实时校验
+            textarea.addEventListener('input', () => {
+                const result = window.MTLinkerValidation.validateDes(textarea.value);
+                textarea.classList.toggle('error', !result.valid);
+                textarea.classList.toggle('warning', !result.valid);
+            });
+        } else if (field === 'name') {
             const input = document.createElement('input');
             input.type = 'text';
             input.value = currentValue;
             cell.innerHTML = '';
             cell.appendChild(input);
+
+            // Name 实时校验
+            input.addEventListener('input', () => {
+                const result = window.MTLinkerValidation.validateName(input.value);
+                input.classList.toggle('error', !result.valid);
+                input.classList.toggle('warning', !result.valid);
+            });
         }
     });
 }
 
-function saveRow(row, btn) {
-    const id = row.dataset.id;
-    const data = { action: 'update', id };
+function validateAndSaveRow(row, btn) {
+    const errors = [];
+    const data = { action: 'update', id: row.dataset.id };
 
-    // 提取所有字段值
+    // 提取并校验所有字段
     row.querySelectorAll('.mtl-editable').forEach(cell => {
         const field = cell.dataset.field;
 
@@ -396,13 +411,47 @@ function saveRow(row, btn) {
             const g = inputs[1].value;
             const b = inputs[2].value;
             const a = inputs[3].value;
+            const result = window.MTLinkerValidation.validateColor(r, g, b, a, config);
+            if (!result.valid) {
+                errors.push(`颜色：${result.msg}`);
+            }
             data[field] = `${r} ${g} ${b} / ${a}`;
         } else if (field === 'des') {
-            data[field] = cell.querySelector('textarea').value;
-        } else {
-            data[field] = cell.querySelector('input').value;
+            const val = cell.querySelector('textarea').value;
+            const result = window.MTLinkerValidation.validateDes(val);
+            if (!result.valid) {
+                errors.push(`描述：${result.msg}`);
+            }
+            data[field] = val;
+        } else if (field === 'name') {
+            const val = cell.querySelector('input').value;
+            const result = window.MTLinkerValidation.validateName(val);
+            if (!result.valid) {
+                errors.push(`名称：${result.msg}`);
+            }
+            data[field] = val;
+        } else if (field === 'link') {
+            const val = cell.querySelector('input').value;
+            const result = window.MTLinkerValidation.validateLink(val, config);
+            if (!result.valid) {
+                errors.push(`链接：${result.msg}`);
+            }
+            data[field] = val;
+        } else if (field === 'icon') {
+            const val = cell.querySelector('input').value;
+            const result = window.MTLinkerValidation.validateIcon(val, config);
+            if (!result.valid) {
+                errors.push(`图标：${result.msg}`);
+            }
+            data[field] = val;
         }
     });
+
+    // 如果有错误，阻止提交
+    if (errors.length > 0) {
+        alert('校验失败，请修正以下错误：\n\n' + errors.join('\n'));
+        return;
+    }
 
     // 提交表单
     const form = document.createElement('form');
@@ -452,7 +501,7 @@ function extractValue(cell, field) {
     align-items: center;
     gap: 8px;
     padding: 12px 24px;
-    background: rgba(var(--adt-colorBoard-Blue) / var(--adt-colorAlpha-100));
+    background: linear-gradient(135deg, rgba(var(--adt-colorBoard-Blue) / 0.9) 0%, rgba(var(--adt-colorBoard-Blue) / 0.7) 100%);
     color: rgba(var(--adt-colorBoard-buttonLabel) / var(--adt-colorAlpha-100));
     border: none;
     border-radius: 12px;
@@ -460,11 +509,27 @@ function extractValue(cell, field) {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(var(--adt-colorBoard-Blue) / 0.2);
 }
 
 .mtl-add-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 16px rgba(var(--adt-colorBoard-Blue) / 0.3);
+}
+
+.mtl-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 16px;
+}
+
+.mtl-page-info {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-65));
 }
 
 .mtl-message {
@@ -526,6 +591,17 @@ function extractValue(cell, field) {
     background: transparent;
     color: inherit;
     font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.mtl-table input.error,
+.mtl-table textarea.error {
+    border-color: rgba(var(--adt-colorBoard-Red) / var(--adt-colorAlpha-100));
+}
+
+.mtl-table input.warning,
+.mtl-table textarea.warning {
+    border-color: rgba(var(--adt-colorBoard-Yellow) / var(--adt-colorAlpha-100));
 }
 
 .mtl-color-preview {
@@ -556,6 +632,7 @@ function extractValue(cell, field) {
     transition: all 0.2s;
     background: rgba(var(--adt-colorBoard-Label) / 0.1);
     color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-100));
+    text-decoration: none;
 }
 
 .mtl-btn:hover {
@@ -583,6 +660,7 @@ function extractValue(cell, field) {
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(4px);
 }
 
 .mtl-modal.show {
@@ -591,60 +669,44 @@ function extractValue(cell, field) {
 
 .mtl-modal-content {
     background: rgba(var(--adt-colorBoard-Background) / 1);
-    padding: 32px;
+    padding: 0;
     border-radius: 16px;
-    max-width: 540px;
+    max-width: 1200px;
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
-.mtl-modal h2 {
-    margin-bottom: 24px;
-}
-
-.mtl-form-group {
-    margin-bottom: 20px;
-}
-
-.mtl-form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.mtl-form-group input,
-.mtl-form-group textarea,
-.mtl-form-group select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.2);
-    border-radius: 8px;
-    background: transparent;
-    color: inherit;
-    font-size: 14px;
-}
-
-.mtl-color-inputs {
+.mtl-modal-header {
     display: flex;
-    gap: 8px;
+    justify-content: space-between;
     align-items: center;
+    padding: 24px 32px;
+    border-bottom: 0.5px solid rgba(var(--adt-colorBoard-Label) / 0.13);
 }
 
-.mtl-color-inputs input {
-    flex: 1;
+.mtl-modal-header h2 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 600;
 }
 
-.mtl-modal-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    margin-top: 24px;
+.mtl-modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(var(--adt-colorBoard-Label) / 0.1);
+    border-radius: 8px;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: rgba(var(--adt-colorBoard-Label) / var(--adt-colorAlpha-65));
 }
 
-.mtl-btn-primary {
-    background: rgba(var(--adt-colorBoard-Blue) / var(--adt-colorAlpha-100));
-    color: rgba(var(--adt-colorBoard-buttonLabel) / var(--adt-colorAlpha-100));
+.mtl-modal-close:hover {
+    background: rgba(var(--adt-colorBoard-Red) / 0.1);
+    color: rgba(var(--adt-colorBoard-Red) / var(--adt-colorAlpha-100));
 }
 </style>
